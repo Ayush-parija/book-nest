@@ -1,0 +1,118 @@
+from fastapi import APIRouter, Depends, Query
+from sqlalchemy.orm import Session
+
+from app.db.dependencies import get_db
+from app.dependencies.auth import get_current_user
+
+from app.models.enums import BookStatus
+from app.models.user import User
+
+from app.schemas.book import (
+    BookCreate,
+    BookUpdate,
+    BookResponse,
+)
+
+from app.services.book_service import (
+    create_book,
+    get_book,
+    get_books,
+    update_book,
+    delete_book,
+)
+
+router = APIRouter(
+    prefix="/books",
+    tags=["Books"],
+)
+
+
+@router.post(
+    "",
+    response_model=BookResponse,
+)
+def create_new_book(
+    data: BookCreate,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    return create_book(
+        db,
+        current_user,
+        data,
+    )
+
+
+@router.get(
+    "",
+    response_model=list[BookResponse],
+)
+def list_books(
+    page: int = Query(1, ge=1),
+    page_size: int = Query(10, ge=1, le=100),
+    status: BookStatus | None = None,
+    search: str | None = None,
+    sort_by: str = "created_at",
+    order: str = "desc",
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    return get_books(
+        db=db,
+        current_user=current_user,
+        page=page,
+        page_size=page_size,
+        status=status,
+        search=search,
+        sort_by=sort_by,
+        order=order,
+    )
+
+
+@router.get(
+    "/{book_id}",
+    response_model=BookResponse,
+)
+def get_single_book(
+    book_id: int,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    return get_book(
+        db,
+        current_user,
+        book_id,
+    )
+
+
+@router.patch(
+    "/{book_id}",
+    response_model=BookResponse,
+)
+def edit_book(
+    book_id: int,
+    data: BookUpdate,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    return update_book(
+        db,
+        current_user,
+        book_id,
+        data,
+    )
+
+
+@router.delete(
+    "/{book_id}",
+)
+def remove_book(
+    book_id: int,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    return delete_book(
+        db,
+        current_user,
+        book_id,
+    )
