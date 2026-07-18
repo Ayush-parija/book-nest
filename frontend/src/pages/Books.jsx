@@ -101,9 +101,9 @@ function Books() {
             }}
           >
             <option value="">All Status</option>
-            <option value="WANT_TO_READ">Want To Read</option>
-            <option value="READING">Reading</option>
-            <option value="FINISHED">Finished</option>
+            <option value="Want to Read">Want To Read</option>
+            <option value="Reading">Reading</option>
+            <option value="Finished">Finished</option>
           </select>
         </div>
 
