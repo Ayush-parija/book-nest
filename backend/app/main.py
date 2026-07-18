@@ -59,12 +59,16 @@ from app.models.activity import Activity
 # Create database tables
 Base.metadata.create_all(bind=engine)
 
+import os
+
+IS_PRODUCTION = os.getenv("ENVIRONMENT") == "production"
+
 app = FastAPI(
     title="BookNest API",
     version="1.0.0",
     description="BookNest Backend API",
-    docs_url=None,
-    redoc_url=None,
+    docs_url=None if IS_PRODUCTION else "/docs",
+    redoc_url=None if IS_PRODUCTION else "/redoc",
 )
 
 # =========================
