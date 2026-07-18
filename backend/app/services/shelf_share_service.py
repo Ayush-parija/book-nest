@@ -11,7 +11,12 @@ from app.repositories.shelf_share_repository import ShelfShareRepository
 from app.services.permission_service import PermissionService
 from app.services.activity_service import log_activity
 
-from app.schemas.shelf_share import ShelfShareCreate, ShelfCollaboratorResponse
+from app.schemas.shelf_share import (
+    ShelfShareCreate,
+    ShelfCollaboratorResponse,
+    ShelfShareUpdate,
+    SharedShelfResponse,
+)
 
 
 def share_shelf(
@@ -88,8 +93,6 @@ def share_shelf(
         "message": "Shelf shared successfully."
     }
 
-from app.schemas.shelf_share import ShelfShareUpdate
-
 def update_share_role(
     db: Session,
     current_user: User,
@@ -159,7 +162,7 @@ def remove_collaborator(
 
     ShelfShareRepository.remove_share(
         db=db,
-        collaborator=collaborator,
+        share=collaborator,
     )
 
     log_activity(
@@ -172,8 +175,6 @@ def remove_collaborator(
     return {
         "message": "Collaborator removed successfully."
     }
-
-from app.schemas.shelf_share import SharedShelfResponse
 
 def shared_with_me(
     db: Session,
