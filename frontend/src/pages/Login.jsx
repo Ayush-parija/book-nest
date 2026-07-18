@@ -59,10 +59,6 @@ function Login() {
           >
             📚 BookNest
           </h1>
-
-          <p style={{ color: "#bdbdbd" }}>
-            Personal Library Management System
-          </p>
         </div>
 
         <div className="mb-3">
