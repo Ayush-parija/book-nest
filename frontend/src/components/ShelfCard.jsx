@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 
-function ShelfCard({ shelf }) {
+function ShelfCard({ shelf, isShared }) {
   if (!shelf) return null;
 
   return (
@@ -15,9 +15,23 @@ function ShelfCard({ shelf }) {
           Shelf ID: {shelf.id}
         </p>
 
-        <p>
-          Owner ID: {shelf.owner_id}
-        </p>
+        {isShared ? (
+          <>
+            <p>
+              <strong>Owner:</strong> {shelf.owner_name}
+            </p>
+            <p>
+              <strong>Role:</strong>{" "}
+              <span className="badge bg-info">
+                {shelf.role}
+              </span>
+            </p>
+          </>
+        ) : (
+          <p>
+            Owner ID: {shelf.owner_id}
+          </p>
+        )}
 
         <Link
           to={`/shelves/${shelf.id}`}

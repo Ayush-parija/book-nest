@@ -14,7 +14,10 @@ function Shelves() {
 
       const [myShelvesData, sharedShelvesData] = await Promise.all([
         getShelves(),
-        getSharedShelves().catch(() => []) // Fallback in case of error
+        getSharedShelves().catch((err) => {
+          console.error("Failed to load shared shelves:", err);
+          return [];
+        }),
       ]);
 
       if (Array.isArray(myShelvesData)) {
@@ -79,17 +82,17 @@ function Shelves() {
         </div>
       )}
 
-      {sharedShelves.length > 0 && (
-        <>
-          <h2 className="text-white mt-5 mb-4">👥 Shared With Me</h2>
-          <div className="row">
-            {sharedShelves.map((shelf) => (
-              <div key={shelf.id} className="col-md-6 col-lg-4 mb-4">
-                <ShelfCard shelf={shelf} refreshShelves={fetchShelves} />
-              </div>
-            ))}
-          </div>
-        </>
+      <h2 className="text-white mt-5 mb-4">👥 Shared With Me</h2>
+      {sharedShelves.length === 0 ? (
+        <div className="alert alert-info">No shelves have been shared with you yet.</div>
+      ) : (
+        <div className="row">
+          {sharedShelves.map((shelf) => (
+            <div key={`shared-${shelf.id}`} className="col-md-6 col-lg-4 mb-4">
+              <ShelfCard shelf={shelf} isShared={true} refreshShelves={fetchShelves} />
+            </div>
+          ))}
+        </div>
       )}
     </div>
   );
