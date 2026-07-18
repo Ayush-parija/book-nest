@@ -10,6 +10,7 @@ from app.repositories.user_repository import UserRepository
 from app.schemas.lending import LendBookRequest
 
 from app.services.activity_service import log_activity
+from app.websocket.connection_manager import manager
 
 
 # ----------------------------------------
@@ -78,6 +79,12 @@ def lend_book(
         action="BOOK_LENT",
         message=f"{current_user.name} lent '{book.title}' to {borrower.name}",
     )
+    
+    # Notify borrower specifically
+    manager.send_to_user_sync(
+        borrower.id, 
+        f"📚 {current_user.name} lent you '{book.title}'!"
+    )
 
     return lending
 
@@ -124,6 +131,11 @@ def return_book(
         current_user=current_user,
         action="BOOK_RETURNED",
         message=f"{current_user.name} returned '{book.title}'",
+    )
+    
+    manager.send_to_user_sync(
+        lending.borrower_id,
+        f"🔄 {current_user.name} took back '{book.title}'"
     )
 
     return {

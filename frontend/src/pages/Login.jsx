@@ -15,6 +15,9 @@ function Login() {
       // access_token is stored in localStorage for request headers
       // refresh_token is stored as HttpOnly cookie automatically by the browser
       localStorage.setItem("access_token", data.access_token);
+      
+      // Explicitly connect to WebSocket after login
+      import("../services/websocketService").then(m => m.default.connect());
 
       navigate("/dashboard");
     } catch (error) {

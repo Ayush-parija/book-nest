@@ -13,8 +13,15 @@ class WebSocketService {
       return;
     }
 
+    const token = localStorage.getItem("access_token");
+    if (!token) {
+      console.warn("WebSocket connection skipped: No access token found.");
+      return;
+    }
+
     console.log("Connecting to WebSocket...");
-    this.ws = new WebSocket(this.url);
+    const connectionUrl = `${this.url}?token=${token}`;
+    this.ws = new WebSocket(connectionUrl);
 
     this.ws.onopen = () => {
       console.log("WebSocket connected!");

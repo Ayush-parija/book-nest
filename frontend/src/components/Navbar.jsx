@@ -14,6 +14,7 @@ function Navbar() {
       }
 
       localStorage.removeItem("access_token");
+      import("../services/websocketService").then(m => m.default.disconnect());
       navigate("/login");
     }
   };
