@@ -11,6 +11,22 @@ from app.schemas.shelf import ShelfCreate, ShelfUpdate
 from app.services.permission_service import PermissionService
 from app.services.activity_service import log_activity
 
+from app.repositories.shelf_share_repository import ShelfShareRepository
+from app.websocket.connection_manager import manager
+
+
+def _notify_shelf_collaborators(db: Session, shelf, current_user: User, action: str, message: str):
+    user_ids = {shelf.owner_id}
+    shares = ShelfShareRepository.get_all_collaborators(db, shelf.id)
+    for share in shares:
+        user_ids.add(share.user_id)
+    
+    user_ids.discard(current_user.id)
+    
+    if manager.active_connections:
+        for uid in user_ids:
+            manager.send_to_user_sync(uid, f"{current_user.name}: {action} - {message}")
+
 
 # ----------------------------------------
 # Create Shelf
@@ -202,6 +218,14 @@ def add_book_to_shelf(
         message=f"{current_user.name} added '{book.title}' to shelf '{shelf.name}'",
     )
 
+    _notify_shelf_collaborators(
+        db=db,
+        shelf=shelf,
+        current_user=current_user,
+        action="BOOK_ADDED_TO_SHELF",
+        message=f"{current_user.name} added '{book.title}' to shelf '{shelf.name}'"
+    )
+
     return shelf
 
 
@@ -248,6 +272,14 @@ def remove_book_from_shelf(
         current_user=current_user,
         action="BOOK_REMOVED_FROM_SHELF",
         message=f"{current_user.name} removed '{book.title}' from shelf '{shelf.name}'",
+    )
+
+    _notify_shelf_collaborators(
+        db=db,
+        shelf=shelf,
+        current_user=current_user,
+        action="BOOK_REMOVED_FROM_SHELF",
+        message=f"{current_user.name} removed '{book.title}' from shelf '{shelf.name}'"
     )
 
     return shelf
