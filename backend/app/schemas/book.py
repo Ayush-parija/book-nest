@@ -10,7 +10,7 @@ class BookCreate(BaseModel):
     author: str
     status: BookStatus = BookStatus.WANT_TO_READ
     total_pages: int | None = None
-    rating: int | None = None
+    rating: int | None = Field(None, ge=1, le=5)
     notes: str | None = None
 
 
@@ -20,7 +20,7 @@ class BookUpdate(BaseModel):
     status: BookStatus | None = None
     total_pages: int | None = None
     current_page: int | None = None
-    rating: int | None = None
+    rating: int | None = Field(None, ge=1, le=5)
     notes: str | None = None
 
 

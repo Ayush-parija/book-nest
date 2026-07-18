@@ -1,3 +1,4 @@
+from datetime import datetime
 from sqlalchemy import func
 from sqlalchemy.orm import Session
 
@@ -102,6 +103,12 @@ class DashboardRepository:
             1 for book in books
             if book.status == BookStatus.FINISHED
         )
+        
+        current_year = datetime.utcnow().year
+        finished_this_year = sum(
+            1 for book in books
+            if book.status == BookStatus.FINISHED and book.finished_at and book.finished_at.year == current_year
+        )
 
         total_pages_read = sum(
             book.current_page or 0
@@ -119,12 +126,25 @@ class DashboardRepository:
             if ratings
             else 0
         )
+        
+        shelves = db.query(Shelf).filter(Shelf.owner_id == owner_id).all()
+        largest_shelf = None
+        max_books = -1
+        for shelf in shelves:
+            if len(shelf.books) > max_books:
+                max_books = len(shelf.books)
+                largest_shelf = shelf.name
+        
+        if not shelves:
+            largest_shelf = "No shelves"
 
         return {
             "total_books": total_books,
             "want_to_read": want_to_read,
             "reading": reading,
             "finished": finished,
+            "finished_this_year": finished_this_year,
             "total_pages_read": total_pages_read,
             "average_rating": average_rating,
+            "largest_shelf": largest_shelf,
         }

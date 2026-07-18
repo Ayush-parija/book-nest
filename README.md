@@ -181,4 +181,13 @@ While BookNest is fully functional, there are several areas I recognize as techn
 
 Furthermore, while the backend enforces strict role-based access control (RBAC) at the service level for shared shelves, the WebSocket authentication handshake requires stricter validation to immediately drop unauthenticated clients upon connection, rather than relying solely on query parameter tokens. On the frontend UI, the activity feeds and book lists currently fetch data continuously. I plan to implement server-side cursor-based pagination and Redis caching to optimize performance as user libraries grow. Finally, the project currently lacks a comprehensive automated testing suite. Adding unit and integration tests using `pytest` for the FastAPI backend and React Testing Library for the frontend components is my highest priority before considering the application fully production-ready.
 
+## AI Usage
 
+During the development of BookNest, I used AI-powered coding assistants (such as GitHub Copilot and Gemini) as productivity tools to accelerate my development workflow. Here is a transparent breakdown of how AI was utilized:
+
+- **Code Scaffolding**: AI was used to generate boilerplate code for repetitive patterns like Pydantic schemas, SQLAlchemy model definitions, and CRUD repository methods. Every generated snippet was reviewed, tested, and adapted to fit BookNest's architecture.
+- **Documentation & Comments**: AI assisted in drafting comprehensive docstrings, file headers, and inline comments across the backend services (`book_service.py`, `activity_service.py`, `dashboard_service.py`). All documentation was reviewed for accuracy.
+- **Debugging Assistance**: When encountering complex issues—such as the synchronous-to-asynchronous WebSocket bridging problem described above—AI was used to brainstorm potential solutions. The final `asyncio.run_coroutine_threadsafe` approach was validated through manual testing.
+- **README Structuring**: AI helped structure and refine sections of this README, including the architecture diagrams and the "What was hard" narrative. All content reflects my genuine development experience.
+
+> **Important**: All core architectural decisions, database schema design, RBAC logic, WebSocket event scoping, and business validation rules were designed and implemented by me. AI served as a coding accelerator, not a replacement for engineering judgment.

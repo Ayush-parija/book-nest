@@ -95,10 +95,12 @@ def log_activity(
         message=message,
     )
 
-    print("Active connections:", len(manager.active_connections))
-
+    # Scoped WebSocket event: only notify the user who performed the action
+    # (Other users involved, e.g. borrowers, are notified directly in their
+    # respective service functions like lending_service.py)
     if manager.active_connections:
-        manager.broadcast_sync(
+        manager.send_to_user_sync(
+            current_user.id,
             f"{current_user.name}: {action} - {message}"
         )
 

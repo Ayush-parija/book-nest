@@ -4,13 +4,17 @@
 # Aggregates data from various repositories to build the dashboard view.
 #
 # Responsibilities:
-# - Fetch user statistics
+# - Fetch user statistics (including finished_this_year, largest_shelf)
 # - Fetch currently reading books
 # - Fetch favorite and recent books
 # - Fetch user shelves
+# - Fetch lent books, shared shelves, and activity feed
 #
 # Depends on:
 # - DashboardRepository
+# - LendingRepository
+# - ShelfShareRepository
+# - ActivityRepository
 # - User model
 #
 # Used by:
@@ -37,6 +41,9 @@ from app.models.user import User
 # [3] Repositories
 # =====================================================
 from app.repositories.dashboard_repository import DashboardRepository
+from app.repositories.lending_repository import LendingRepository
+from app.repositories.shelf_share_repository import ShelfShareRepository
+from app.repositories.activity_repository import get_user_activities
 
 
 # =====================================================
@@ -95,5 +102,17 @@ def get_dashboard(
         "shelves": DashboardRepository.get_shelves(
             db=db,
             owner_id=current_user.id,
+        ),
+        "lent_books": LendingRepository.get_lent_books(
+            db=db,
+            owner_id=current_user.id,
+        ),
+        "shared_shelves": ShelfShareRepository.get_shared_shelves(
+            db=db,
+            user_id=current_user.id,
+        ),
+        "activity_feed": get_user_activities(
+            db=db,
+            user_id=current_user.id,
         ),
     }
