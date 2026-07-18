@@ -17,6 +17,8 @@ class ReturnBookResponse(BaseModel):
     message: str
 
 
+from pydantic import BaseModel, EmailStr, ConfigDict, model_validator
+
 # -----------------------------
 # Lending Response
 # -----------------------------
@@ -32,6 +34,21 @@ class LendingResponse(BaseModel):
     model_config = ConfigDict(
         from_attributes=True,
     )
+
+    @model_validator(mode="before")
+    @classmethod
+    def extract_relations(cls, data):
+        if not isinstance(data, dict) and hasattr(data, "book"):
+            return {
+                "id": data.id,
+                "book_id": data.book_id,
+                "book_title": data.book.title if data.book else "",
+                "borrower_email": data.borrower.email if data.borrower else "",
+                "owner_email": data.owner.email if data.owner else "",
+                "lent_at": data.lent_at,
+                "returned_at": data.returned_at,
+            }
+        return data
 
 
 # -----------------------------
