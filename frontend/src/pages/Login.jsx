@@ -12,9 +12,9 @@ function Login() {
     try {
       const data = await loginUser(email, password);
 
-      // access_token is stored in localStorage for request headers
-      // refresh_token is stored as HttpOnly cookie automatically by the browser
-      localStorage.setItem("access_token", data.access_token);
+      // access_token is stored in sessionStorage for request headers
+      // This allows testing multiple users in different tabs
+      sessionStorage.setItem("access_token", data.access_token);
       
       // Explicitly connect to WebSocket after login
       import("../services/websocketService").then(m => m.default.connect());

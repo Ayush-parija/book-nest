@@ -13,7 +13,7 @@ function Navbar() {
         // Even if logout API fails, clear local state
       }
 
-      localStorage.removeItem("access_token");
+      sessionStorage.removeItem("access_token");
       import("../services/websocketService").then(m => m.default.disconnect());
       alert("Logout successful");
       navigate("/login");

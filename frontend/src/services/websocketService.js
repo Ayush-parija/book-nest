@@ -13,7 +13,7 @@ class WebSocketService {
       return;
     }
 
-    const token = localStorage.getItem("access_token");
+    const token = sessionStorage.getItem("access_token");
     if (!token) {
       console.warn("WebSocket connection skipped: No access token found.");
       return;
