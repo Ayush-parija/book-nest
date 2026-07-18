@@ -22,7 +22,7 @@ function Sidebar() {
         boxSizing: "border-box",
       }}
     >
-      <h2 style={{ marginBottom: "25px" }}>📚 BookNest</h2>
+      <h2 style={{ marginBottom: "25px", color: "red" }}>📚 BookNest</h2>
 
       {/* Dashboard */}
       <NavLink to="/dashboard" style={linkStyle}>

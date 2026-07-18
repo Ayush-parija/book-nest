@@ -52,7 +52,7 @@ function Login() {
         <div className="text-center mb-4">
           <h1
             style={{
-              color: "#0d6efd",
+              color: "red",
               fontWeight: "bold",
               fontSize: "42px",
             }}

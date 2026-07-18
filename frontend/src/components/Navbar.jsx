@@ -27,7 +27,7 @@ function Navbar() {
 
         <span
           className="navbar-brand fw-bold fs-3"
-          style={{ cursor: "pointer" }}
+          style={{ cursor: "pointer", color: "red" }}
           onClick={() => navigate("/dashboard")}
         >
           📚 BookNest
