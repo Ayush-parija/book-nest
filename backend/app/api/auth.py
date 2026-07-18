@@ -66,7 +66,6 @@ def login(
         httponly=True,              # Not accessible from JavaScript
         samesite="lax",            # Protect against CSRF
         max_age=7 * 24 * 60 * 60,  # 7 days in seconds
-        path="/auth",              # Only sent to /auth/* endpoints
     )
 
     return {
@@ -133,6 +132,5 @@ def logout(response: Response):
     """
     response.delete_cookie(
         key="refresh_token",
-        path="/auth",
     )
     return {"message": "Logged out successfully"}
