@@ -63,6 +63,8 @@ app = FastAPI(
     title="BookNest API",
     version="1.0.0",
     description="BookNest Backend API",
+    docs_url=None,
+    redoc_url=None,
 )
 
 # =========================
