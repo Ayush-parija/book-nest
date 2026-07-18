@@ -62,30 +62,79 @@ Ensure you have the following installed on your local machine:
 
 ## Architecture & Data Model
 
-BookNest follows a relational data model designed for scalability and real-time updates. Below is the core architecture:
-
-| 🏗️ Entity | 📖 Description | 🔑 Key Relationships |
-|:---|:---|:---|
-| **Users** | Authentication (hashed passwords) and profiles. | Owns `Books`, `Shelves`. Generates `Activities`. |
-| **Books** | The core item being tracked (title, author, progress, rating). | Placed in `Shelves`. Can be `Lent`. |
-| **Shelves** | Custom groupings of books created by a user. | Shared via `ShelfShares`. |
-| **ShelfShares** | Join table linking Users to Shelves they don't own. | Tracks `ShelfRole` (OWNER, EDITOR, VIEWER). |
-| **Lendings** | Record indicating a Book is temporarily with another User. | Tracks `lent_at` and `returned_at`. |
-| **Activity** | Audit log of all significant events. | Used for WebSocket notifications. |
+BookNest follows a relational data model designed for scalability and real-time updates. Each entity below is shown as an individual box with its key fields and responsibilities.
 
 > [!NOTE]
 > All relationships are strictly enforced at the database level using SQLAlchemy foreign keys and cascade rules.
 
 ```mermaid
-erDiagram
-    USER ||--o{ BOOK : owns
-    USER ||--o{ SHELF : owns
-    USER ||--o{ SHELF_SHARE : receives
-    USER ||--o{ LENDING : lends
-    USER ||--o{ ACTIVITY : generates
-    SHELF ||--o{ SHELF_SHARE : shared_with
-    BOOK }o--o{ SHELF : placed_in
-    BOOK ||--o{ LENDING : is_lent
+classDiagram
+    class USER {
+        +int id
+        +string name
+        +string email
+        +string hashed_password
+        +datetime created_at
+        Owns Books and Shelves
+        Generates Activity logs
+    }
+
+    class BOOK {
+        +int id
+        +string title
+        +string author
+        +int total_pages
+        +int current_page
+        +float rating
+        +bool is_favorite
+        +enum status
+        +int owner_id FK
+        Core item being tracked
+    }
+
+    class SHELF {
+        +int id
+        +string name
+        +string description
+        +int owner_id FK
+        Custom grouping of books
+    }
+
+    class SHELF_SHARE {
+        +int id
+        +int shelf_id FK
+        +int user_id FK
+        +enum role OWNER/EDITOR/VIEWER
+        Join table for shared access
+    }
+
+    class LENDING {
+        +int id
+        +int book_id FK
+        +int lender_id FK
+        +int borrower_id FK
+        +datetime lent_at
+        +datetime returned_at
+        Tracks book borrowing
+    }
+
+    class ACTIVITY {
+        +int id
+        +int user_id FK
+        +string action
+        +string message
+        +datetime timestamp
+        Audit log of all events
+    }
+
+    USER "1" --> "*" BOOK : owns
+    USER "1" --> "*" SHELF : owns
+    USER "1" --> "*" SHELF_SHARE : receives
+    USER "1" --> "*" LENDING : lends
+    USER "1" --> "*" ACTIVITY : generates
+    SHELF "1" --> "*" SHELF_SHARE : shared_with
+    BOOK "*" --> "*" SHELF : placed_in
+    BOOK "1" --> "*" LENDING : is_lent
 ```
 
 ## Stack Choice & Rationale
