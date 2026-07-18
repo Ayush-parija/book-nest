@@ -11,7 +11,7 @@ from app.repositories.shelf_share_repository import ShelfShareRepository
 from app.services.permission_service import PermissionService
 from app.services.activity_service import log_activity
 
-from app.schemas.shelf_share import ShelfShareCreate
+from app.schemas.shelf_share import ShelfShareCreate, ShelfCollaboratorResponse
 
 
 def share_shelf(
@@ -192,6 +192,36 @@ def shared_with_me(
                 id=shelf.id,
                 name=shelf.name,
                 owner_name=owner.name,
+                role=share.role,
+            )
+        )
+
+    return response
+
+def get_collaborators(
+    db: Session,
+    current_user: User,
+    shelf_id: int,
+):
+    # Verify the user has access to the shelf
+    PermissionService.require_viewer(
+        db=db,
+        shelf_id=shelf_id,
+        user_id=current_user.id,
+    )
+
+    results = ShelfShareRepository.get_collaborators_with_users(
+        db=db,
+        shelf_id=shelf_id,
+    )
+
+    response = []
+    for share, user in results:
+        response.append(
+            ShelfCollaboratorResponse(
+                id=user.id,
+                name=user.name,
+                email=user.email,
                 role=share.role,
             )
         )

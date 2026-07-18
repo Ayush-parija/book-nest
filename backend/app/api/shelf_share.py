@@ -10,6 +10,7 @@ from app.schemas.shelf_share import (
     ShelfShareCreate,
     ShelfShareUpdate,
     SharedShelfResponse,
+    ShelfCollaboratorResponse,
 )
 
 from app.services.shelf_share_service import (
@@ -17,6 +18,7 @@ from app.services.shelf_share_service import (
     update_share_role,
     remove_collaborator,
     shared_with_me,
+    get_collaborators,
 )
 
 # shelf_share.py
@@ -36,6 +38,21 @@ def shared(
     return shared_with_me(
         db=db,
         current_user=current_user,
+    )
+
+@router.get(
+    "/{shelf_id}/collaborators",
+    response_model=list[ShelfCollaboratorResponse],
+)
+def get_shelf_collaborators(
+    shelf_id: int,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    return get_collaborators(
+        db=db,
+        current_user=current_user,
+        shelf_id=shelf_id,
     )
 
 @router.post("/{shelf_id}/share")

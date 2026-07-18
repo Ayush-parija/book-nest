@@ -57,6 +57,18 @@ class ShelfShareRepository:
         )
 
     @staticmethod
+    def get_collaborators_with_users(
+        db: Session,
+        shelf_id: int,
+    ):
+        return (
+            db.query(ShelfShare, User)
+            .join(User, User.id == ShelfShare.user_id)
+            .filter(ShelfShare.shelf_id == shelf_id)
+            .all()
+        )
+
+    @staticmethod
     def create_share(
         db: Session,
         shelf_id: int,

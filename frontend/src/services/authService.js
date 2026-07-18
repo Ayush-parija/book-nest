@@ -43,3 +43,16 @@ export const signupUser = async (userData) => {
         throw error;
     }
 };
+
+// =======================
+// Get Current User
+// =======================
+export const getCurrentUser = async () => {
+    try {
+        const response = await api.get("/auth/me");
+        return response.data;
+    } catch (error) {
+        console.error("GetCurrentUser Error:", error);
+        throw error;
+    }
+};

@@ -73,8 +73,28 @@ export const removeBookFromShelf = async (shelfId, bookId) => {
 // Share a shelf
 export const shareShelf = async (shelfId, data) => {
   const response = await api.post(
-    `/shelves/${shelfId}/share`,
+    `/shared-shelves/${shelfId}/share`,
     data
   );
+  return response.data;
+};
+
+// Get collaborators for a shelf
+export const getShelfCollaborators = async (shelfId) => {
+  const response = await api.get(`/shared-shelves/${shelfId}/collaborators`);
+  return response.data;
+};
+
+// Update a collaborator's role
+export const updateCollaboratorRole = async (shelfId, collaboratorId, role) => {
+  const response = await api.patch(`/shared-shelves/${shelfId}/share/${collaboratorId}`, {
+    role,
+  });
+  return response.data;
+};
+
+// Remove a collaborator
+export const removeCollaborator = async (shelfId, collaboratorId) => {
+  const response = await api.delete(`/shared-shelves/${shelfId}/share/${collaboratorId}`);
   return response.data;
 };

@@ -5,13 +5,19 @@ import {
   getShelf,
   getShelfBooks,
   removeBookFromShelf,
+  getShelfCollaborators,
+  updateCollaboratorRole,
+  removeCollaborator,
 } from "../services/shelfService";
+import { getCurrentUser } from "../services/authService";
 
 function ShelfDetails() {
   const { id } = useParams();
 
   const [shelf, setShelf] = useState(null);
   const [books, setBooks] = useState([]);
+  const [collaborators, setCollaborators] = useState([]);
+  const [currentUser, setCurrentUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
   const fetchShelf = async () => {
@@ -20,9 +26,18 @@ function ShelfDetails() {
 
       const shelfData = await getShelf(id);
       const booksData = await getShelfBooks(id);
+      const user = await getCurrentUser();
 
       setShelf(shelfData);
       setBooks(Array.isArray(booksData) ? booksData : []);
+      setCurrentUser(user);
+
+      try {
+        const collabData = await getShelfCollaborators(id);
+        setCollaborators(Array.isArray(collabData) ? collabData : []);
+      } catch (err) {
+        console.error("Load Collaborators Error:", err);
+      }
     } catch (error) {
       console.error("Load Shelf Error:", error);
 
@@ -59,6 +74,29 @@ function ShelfDetails() {
         error.response?.data?.detail ||
         "Failed to remove book."
       );
+    }
+  };
+
+  const handleRoleChange = async (collaboratorId, newRole) => {
+    try {
+      await updateCollaboratorRole(id, collaboratorId, newRole);
+      alert("Role updated successfully.");
+      fetchShelf();
+    } catch (error) {
+      console.error("Update Role Error:", error);
+      alert(error.response?.data?.detail || "Failed to update role.");
+    }
+  };
+
+  const handleRemoveCollaborator = async (collaboratorId) => {
+    if (!window.confirm("Are you sure you want to remove this collaborator?")) return;
+    try {
+      await removeCollaborator(id, collaboratorId);
+      alert("Collaborator removed successfully.");
+      fetchShelf();
+    } catch (error) {
+      console.error("Remove Collaborator Error:", error);
+      alert(error.response?.data?.detail || "Failed to remove collaborator.");
     }
   };
 
@@ -111,6 +149,41 @@ function ShelfDetails() {
         </div>
 
       </div>
+
+      {collaborators.length > 0 && (
+        <div className="mb-4">
+          <h4 className="text-white">Collaborators</h4>
+          <ul className="list-group list-group-flush bg-transparent">
+            {collaborators.map((collab) => (
+              <li key={collab.id} className="list-group-item bg-dark text-white d-flex justify-content-between align-items-center mb-2" style={{ borderRadius: '8px' }}>
+                <div>
+                  <strong>{collab.name}</strong> ({collab.email})
+                  <span className="badge bg-secondary ms-2">{collab.role}</span>
+                </div>
+                {currentUser?.id === shelf?.owner_id && (
+                  <div className="d-flex gap-2">
+                    <select
+                      className="form-select form-select-sm"
+                      value={collab.role}
+                      onChange={(e) => handleRoleChange(collab.id, e.target.value)}
+                      style={{ width: 'auto' }}
+                    >
+                      <option value="VIEWER">Viewer</option>
+                      <option value="EDITOR">Editor</option>
+                    </select>
+                    <button
+                      className="btn btn-sm btn-danger"
+                      onClick={() => handleRemoveCollaborator(collab.id)}
+                    >
+                      Remove
+                    </button>
+                  </div>
+                )}
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
 
       {books.length === 0 ? (
         <div className="alert alert-info">
