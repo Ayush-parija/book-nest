@@ -169,19 +169,16 @@ BookNest provides real-time activity feeds and instant toast notifications witho
 - **Synchronous Broadcasting**: Because our database CRUD services run synchronously (for performance and simplified transaction management), the `ConnectionManager` utilizes `asyncio.run_coroutine_threadsafe` to safely dispatch asynchronous broadcast events back to the main event loop.
 - **Disconnects/Reconnects**: The React client includes an automatic exponential backoff reconnection strategy. If the server drops the connection, the client will silently try to reconnect at increasing intervals.
 
-## Challenges & Solutions
+## What was hard and how I worked through it
 
-### The Async/Sync WebSocket Trap
-**Challenge**: When WebSockets were first introduced, the `await manager.broadcast()` call forced us to convert our entire service layer (`book_service`, `shelf_service`) to `async def`. However, FastAPI runs normal `def` router endpoints in a threadpool where there is no running event loop. This caused Pydantic to throw `ResponseValidationError` when it attempted to serialize unresolved coroutine objects.
-**Solution**: We successfully reverted the entire service layer back to standard, clean synchronous functions. We achieved real-time broadcasting by tracking the main event loop inside the `ConnectionManager` and exposing a `broadcast_sync` method. This allowed our threadpool-bound CRUD services to safely push messages into the async WebSocket stream without blocking or throwing errors.
+One of the most complex challenges I faced during the development of BookNest was bridging the gap between my synchronous database service layer and the asynchronous WebSocket connections used for real-time notifications. Initially, implementing the WebSocket broadcast function forced me to convert my entire service layer—such as my book and shelf services—into `async` functions. However, FastAPI executes standard router endpoints in a threadpool without a running event loop, which immediately caused Pydantic to throw `ResponseValidationError` exceptions when attempting to serialize unresolved coroutine objects. 
 
-## Known Issues & What's Incomplete
-- **Targeted WebSocket Events**: Currently, activity is broadcast globally. We need to implement room-based or user-specific broadcasting so users only receive notifications relevant to their own actions or shelves shared with them.
-- **WebSocket Auth Verification**: The WebSocket connection needs stricter handshake validation to ensure unauthenticated clients are dropped immediately upon connection.
+To resolve this, I decided to revert my core service and repository layers back to clean, synchronous functions, which greatly simplified database transaction management with SQLAlchemy. I worked through the WebSocket concurrency issue by redesigning my `ConnectionManager`. I tracked the main asynchronous event loop upon server startup and implemented a `send_to_user_sync` method utilizing `asyncio.run_coroutine_threadsafe`. This architectural decision allowed my threadpool-bound CRUD services to safely dispatch real-time events into the async WebSocket stream without blocking the server or triggering serialization errors. Additionally, implementing a seamless, silent JWT refresh token flow using `HttpOnly` cookies and Axios interceptors required careful debugging of race conditions to ensure users stayed authenticated without repetitive logins.
 
-## Future Improvements
-- **Pagination & Caching**: Implement cursor-based pagination for the Activity feed and Redis caching for frequently accessed shelves.
-- **Testing**: Add a comprehensive suite of unit and integration tests using `pytest` and `React Testing Library`.
-- **Dockerization**: Containerize the database, backend, and frontend via `docker-compose` for a true one-click setup.
+## Known issues / What is incomplete
+
+While BookNest is fully functional, there are several areas I recognize as technical debt and opportunities for future enhancement. Currently, the real-time WebSocket architecture relies on an in-memory `ConnectionManager`. This works perfectly for a single-server deployment, but it limits scalability; if the backend were deployed across multiple instances behind a load balancer, users connected to different servers wouldn't receive each other's broadcasts. Integrating Redis Pub/Sub to sync WebSocket state across horizontally scaled nodes is a necessary future architectural improvement. 
+
+Furthermore, while the backend enforces strict role-based access control (RBAC) at the service level for shared shelves, the WebSocket authentication handshake requires stricter validation to immediately drop unauthenticated clients upon connection, rather than relying solely on query parameter tokens. On the frontend UI, the activity feeds and book lists currently fetch data continuously. I plan to implement server-side cursor-based pagination and Redis caching to optimize performance as user libraries grow. Finally, the project currently lacks a comprehensive automated testing suite. Adding unit and integration tests using `pytest` for the FastAPI backend and React Testing Library for the frontend components is my highest priority before considering the application fully production-ready.
 
 
