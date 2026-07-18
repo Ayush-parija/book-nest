@@ -10,6 +10,12 @@ export const getShelves = async () => {
   return response.data;
 };
 
+// Get shared shelves
+export const getSharedShelves = async () => {
+  const response = await api.get("/shared-shelves/shared");
+  return response.data;
+};
+
 // Get one shelf
 export const getShelf = async (id) => {
   const response = await api.get(`/shelves/${id}`);

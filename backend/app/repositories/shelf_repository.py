@@ -34,17 +34,7 @@ class ShelfRepository:
     ):
         return (
             db.query(Shelf)
-            .outerjoin(
-                ShelfShare,
-                Shelf.id == ShelfShare.shelf_id,
-            )
-            .filter(
-                or_(
-                    Shelf.owner_id == user_id,
-                    ShelfShare.user_id == user_id,
-                )
-            )
-            .distinct()
+            .filter(Shelf.owner_id == user_id)
             .all()
         )
 
