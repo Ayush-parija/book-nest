@@ -48,6 +48,17 @@ class BookRepository:
         )
 
     @staticmethod
+    def get_by_id_any(
+        db: Session,
+        book_id: int,
+    ):
+        return (
+            db.query(Book)
+            .filter(Book.id == book_id)
+            .first()
+        )
+
+    @staticmethod
     def get_all(
         db: Session,
         owner_id: int,

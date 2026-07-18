@@ -226,7 +226,7 @@ def remove_book_from_shelf(
         shelf_id=shelf_id,
     )
 
-    book = BookRepository.get_by_id(
+    book = BookRepository.get_by_id_any(
         db=db,
         book_id=book_id,
     )
