@@ -9,11 +9,15 @@ function ReadingProgress() {
   const fetchBooks = async () => {
     try {
       setLoading(true);
-      // Fetch books that the user wants to read or is currently reading
-      // We'll fetch all books for now and filter locally for simplicity, 
-      // or we can just show all of them as they did before.
-      const data = await getBooks({ page_size: 100 }); 
-      setBooks(data);
+      const data = await getBooks({ page_size: 100 });
+      // Backend returns a plain list[BookResponse]
+      if (Array.isArray(data)) {
+        setBooks(data);
+      } else if (Array.isArray(data?.items)) {
+        setBooks(data.items);
+      } else {
+        setBooks([]);
+      }
     } catch (error) {
       console.error(error);
       alert("Failed to load books.");

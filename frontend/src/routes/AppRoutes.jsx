@@ -26,6 +26,7 @@ import BorrowedBooks from "../pages/BorrowedBooks";
 import LentBooks from "../pages/LentBooks";
 
 import Activity from "../pages/Activity";
+import ReadingProgress from "../pages/ReadingProgress";
 
 
 function AppRoutes() {
@@ -186,6 +187,15 @@ function AppRoutes() {
         element={
           <Layout>
             <Activity />
+          </Layout>
+        }
+      />
+
+      <Route
+        path="/reading-progress"
+        element={
+          <Layout>
+            <ReadingProgress />
           </Layout>
         }
       />
