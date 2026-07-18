@@ -84,7 +84,9 @@ function ShelfDetails() {
       fetchShelf();
     } catch (error) {
       console.error("Update Role Error:", error);
-      alert(error.response?.data?.detail || "Failed to update role.");
+      const detail = error.response?.data?.detail;
+      const msg = Array.isArray(detail) ? detail[0].msg : (detail || "Failed to update role.");
+      alert(msg);
     }
   };
 
@@ -96,7 +98,9 @@ function ShelfDetails() {
       fetchShelf();
     } catch (error) {
       console.error("Remove Collaborator Error:", error);
-      alert(error.response?.data?.detail || "Failed to remove collaborator.");
+      const detail = error.response?.data?.detail;
+      const msg = Array.isArray(detail) ? detail[0].msg : (detail || "Failed to remove collaborator.");
+      alert(msg);
     }
   };
 
@@ -168,8 +172,8 @@ function ShelfDetails() {
                       onChange={(e) => handleRoleChange(collab.id, e.target.value)}
                       style={{ width: 'auto' }}
                     >
-                      <option value="VIEWER">Viewer</option>
-                      <option value="EDITOR">Editor</option>
+                      <option value="viewer">Viewer</option>
+                      <option value="editor">Editor</option>
                     </select>
                     <button
                       className="btn btn-sm btn-danger"
