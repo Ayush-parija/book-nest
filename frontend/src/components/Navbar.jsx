@@ -1,13 +1,19 @@
 import { useNavigate } from "react-router-dom";
+import api from "../api/axios";
 
 function Navbar() {
   const navigate = useNavigate();
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
     if (window.confirm("Are you sure you want to logout?")) {
-      localStorage.removeItem("token");
-      localStorage.removeItem("refreshToken");
+      try {
+        // Clears the HttpOnly refresh_token cookie on the server
+        await api.post("/auth/logout");
+      } catch (_) {
+        // Even if logout API fails, clear local state
+      }
 
+      localStorage.removeItem("access_token");
       navigate("/login");
     }
   };

@@ -12,9 +12,9 @@ function Login() {
     try {
       const data = await loginUser(email, password);
 
-      localStorage.setItem("token", data.access_token);
-
-      alert("Login Successful!");
+      // access_token is stored in localStorage for request headers
+      // refresh_token is stored as HttpOnly cookie automatically by the browser
+      localStorage.setItem("access_token", data.access_token);
 
       navigate("/dashboard");
     } catch (error) {

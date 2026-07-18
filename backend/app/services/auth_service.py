@@ -33,8 +33,7 @@ def create_user(data: SignupRequest, db: Session) -> User:
     return UserRepository.create(user, db)
 
 
-def login_user(data: LoginRequest, db: Session):
-
+def login_user(data: LoginRequest, db: Session) -> dict:
     user = UserRepository.get_by_email(data.email, db)
 
     if not user:
