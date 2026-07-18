@@ -1,3 +1,35 @@
+# =========================================================
+# File: main.py
+# Purpose:
+# The entry point for the FastAPI application.
+#
+# Responsibilities:
+# - Initialize FastAPI application instance
+# - Configure CORS (Cross-Origin Resource Sharing)
+# - Connect and create database tables
+# - Register and include all API routers
+#
+# Depends on:
+# - FastAPI framework
+# - Database engine (app.db.database)
+# - All API routers (app.api.*)
+#
+# Used by:
+# - Uvicorn or other ASGI servers to run the app
+# =========================================================
+
+# Navigation
+# [1] Standard Library & Third-party Imports
+# [2] API Routers
+# [3] Database & Models
+# [4] App Initialization
+# [5] CORS Configuration
+# [6] Router Inclusion
+# [7] Root Endpoint
+
+# =====================================================
+# [1] Standard Library & Third-party Imports
+# =====================================================
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -63,11 +95,32 @@ app.include_router(dashboard_router)
 app.include_router(activity_router)
 app.include_router(websocket_router)
 
-# =========================
-# Root Endpoint
-# =========================
+# =====================================================
+# [7] Root Endpoint
+# =====================================================
 @app.get("/")
 def home():
+    """
+    ---------------------------------------------------------
+    Function:
+    home()
+
+    Purpose:
+    Provides a simple health check and welcome message for the API.
+
+    Parameters:
+    None
+
+    Returns:
+    dict: A welcome message JSON object.
+
+    Raises:
+    None
+
+    Side Effects:
+    None
+    ---------------------------------------------------------
+    """
     return {
         "message": "Welcome to BookNest API"
     }
