@@ -1,6 +1,8 @@
 from fastapi import HTTPException, status
 from sqlalchemy.orm import Session
 
+from app.core.security import decode_token
+
 from app.core.security import (
     create_access_token,
     create_refresh_token,
@@ -54,4 +56,32 @@ def login_user(data: LoginRequest, db: Session):
         "access_token": create_access_token(user.id),
         "refresh_token": create_refresh_token(user.id),
         "token_type": "bearer",
+    }
+
+def refresh_access_token(data):
+    payload = decode_token(data.refresh_token)
+
+    if payload is None:
+        raise HTTPException(
+            status_code=401,
+            detail="Invalid refresh token",
+        )
+
+    if payload.get("type") != "refresh":
+        raise HTTPException(
+            status_code=401,
+            detail="Invalid refresh token",
+        )
+
+    user_id = int(payload["sub"])
+
+    return {
+        "access_token": create_access_token(user_id),
+        "token_type": "bearer",
+    }
+
+
+def logout_user():
+    return {
+        "message": "Logged out successfully"
     }

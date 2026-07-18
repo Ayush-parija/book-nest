@@ -1,5 +1,7 @@
 from datetime import datetime
-from pydantic import BaseModel, ConfigDict
+
+from pydantic import BaseModel, ConfigDict, Field
+
 from app.models.enums import BookStatus
 
 
@@ -22,6 +24,10 @@ class BookUpdate(BaseModel):
     notes: str | None = None
 
 
+class ReadingProgressUpdate(BaseModel):
+    current_page: int = Field(..., ge=0)
+
+
 class BookResponse(BaseModel):
     id: int
     title: str
@@ -32,5 +38,7 @@ class BookResponse(BaseModel):
     rating: int | None
     notes: str | None
     created_at: datetime
+    finished_at: datetime | None
+    is_favorite: bool
 
     model_config = ConfigDict(from_attributes=True)

@@ -8,18 +8,38 @@ from app.repositories.shelf_repository import ShelfRepository
 
 from app.schemas.shelf import ShelfCreate, ShelfUpdate
 
+from app.services.permission_service import PermissionService
+from app.services.activity_service import log_activity
+
+
+# ----------------------------------------
+# Create Shelf
+# ----------------------------------------
 
 def create_shelf(
     db: Session,
     current_user: User,
     data: ShelfCreate,
 ):
-    return ShelfRepository.create(
+    shelf = ShelfRepository.create(
         db=db,
         owner_id=current_user.id,
         data=data,
     )
 
+    log_activity(
+        db=db,
+        current_user=current_user,
+        action="SHELF_CREATED",
+        message=f"{current_user.name} created shelf '{shelf.name}'",
+    )
+
+    return shelf
+
+
+# ----------------------------------------
+# Get Shelves
+# ----------------------------------------
 
 def get_shelves(
     db: Session,
@@ -27,22 +47,31 @@ def get_shelves(
 ):
     return ShelfRepository.get_all(
         db=db,
-        owner_id=current_user.id,
+        user_id=current_user.id,
     )
 
+
+# ----------------------------------------
+# Get Shelf
+# ----------------------------------------
 
 def get_shelf(
     db: Session,
     current_user: User,
     shelf_id: int,
 ):
-    shelf = ShelfRepository.get_by_id(
-        db,
-        shelf_id,
-        current_user.id,
+    PermissionService.require_viewer(
+        db=db,
+        shelf_id=shelf_id,
+        user_id=current_user.id,
     )
 
-    if not shelf:
+    shelf = ShelfRepository.get_by_id_without_owner(
+        db=db,
+        shelf_id=shelf_id,
+    )
+
+    if shelf is None:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Shelf not found",
@@ -51,39 +80,75 @@ def get_shelf(
     return shelf
 
 
+# ----------------------------------------
+# Update Shelf
+# ----------------------------------------
+
 def update_shelf(
     db: Session,
     current_user: User,
     shelf_id: int,
     data: ShelfUpdate,
 ):
-    shelf = get_shelf(
-        db,
-        current_user,
-        shelf_id,
+    PermissionService.require_owner(
+        db=db,
+        shelf_id=shelf_id,
+        user_id=current_user.id,
     )
 
-    return ShelfRepository.update(
-        db,
-        shelf,
-        data,
+    shelf = ShelfRepository.get_by_id_without_owner(
+        db=db,
+        shelf_id=shelf_id,
     )
 
+    updated_shelf = ShelfRepository.update(
+        db=db,
+        shelf=shelf,
+        data=data,
+    )
+
+    log_activity(
+        db=db,
+        current_user=current_user,
+        action="SHELF_UPDATED",
+        message=f"{current_user.name} updated shelf '{updated_shelf.name}'",
+    )
+
+    return updated_shelf
+
+
+# ----------------------------------------
+# Delete Shelf
+# ----------------------------------------
 
 def delete_shelf(
     db: Session,
     current_user: User,
     shelf_id: int,
 ):
-    shelf = get_shelf(
-        db,
-        current_user,
-        shelf_id,
+    PermissionService.require_owner(
+        db=db,
+        shelf_id=shelf_id,
+        user_id=current_user.id,
     )
 
+    shelf = ShelfRepository.get_by_id_without_owner(
+        db=db,
+        shelf_id=shelf_id,
+    )
+
+    shelf_name = shelf.name
+
     ShelfRepository.delete(
-        db,
-        shelf,
+        db=db,
+        shelf=shelf,
+    )
+
+    log_activity(
+        db=db,
+        current_user=current_user,
+        action="SHELF_DELETED",
+        message=f"{current_user.name} deleted shelf '{shelf_name}'",
     )
 
     return {
@@ -91,9 +156,9 @@ def delete_shelf(
     }
 
 
-# -------------------------
-# Book ↔ Shelf
-# -------------------------
+# ----------------------------------------
+# Add Book to Shelf
+# ----------------------------------------
 
 def add_book_to_shelf(
     db: Session,
@@ -101,30 +166,48 @@ def add_book_to_shelf(
     shelf_id: int,
     book_id: int,
 ):
-    shelf = get_shelf(
-        db,
-        current_user,
-        shelf_id,
+    PermissionService.require_editor(
+        db=db,
+        shelf_id=shelf_id,
+        user_id=current_user.id,
+    )
+
+    shelf = ShelfRepository.get_by_id_without_owner(
+        db=db,
+        shelf_id=shelf_id,
     )
 
     book = BookRepository.get_by_id(
-        db,
-        book_id,
-        current_user.id,
+        db=db,
+        book_id=book_id,
+        owner_id=shelf.owner_id,
     )
 
     if not book:
         raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
+            status_code=404,
             detail="Book not found",
         )
 
-    return ShelfRepository.add_book(
-        db,
-        shelf,
-        book,
+    ShelfRepository.add_book(
+        db=db,
+        shelf=shelf,
+        book=book,
     )
 
+    log_activity(
+        db=db,
+        current_user=current_user,
+        action="BOOK_ADDED_TO_SHELF",
+        message=f"{current_user.name} added '{book.title}' to shelf '{shelf.name}'",
+    )
+
+    return shelf
+
+
+# ----------------------------------------
+# Remove Book from Shelf
+# ----------------------------------------
 
 def remove_book_from_shelf(
     db: Session,
@@ -132,40 +215,63 @@ def remove_book_from_shelf(
     shelf_id: int,
     book_id: int,
 ):
-    shelf = get_shelf(
-        db,
-        current_user,
-        shelf_id,
+    PermissionService.require_editor(
+        db=db,
+        shelf_id=shelf_id,
+        user_id=current_user.id,
+    )
+
+    shelf = ShelfRepository.get_by_id_without_owner(
+        db=db,
+        shelf_id=shelf_id,
     )
 
     book = BookRepository.get_by_id(
-        db,
-        book_id,
-        current_user.id,
+        db=db,
+        book_id=book_id,
+        owner_id=shelf.owner_id,
     )
 
     if not book:
         raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
+            status_code=404,
             detail="Book not found",
         )
 
-    return ShelfRepository.remove_book(
-        db,
-        shelf,
-        book,
+    ShelfRepository.remove_book(
+        db=db,
+        shelf=shelf,
+        book=book,
     )
 
+    log_activity(
+        db=db,
+        current_user=current_user,
+        action="BOOK_REMOVED_FROM_SHELF",
+        message=f"{current_user.name} removed '{book.title}' from shelf '{shelf.name}'",
+    )
+
+    return shelf
+
+
+# ----------------------------------------
+# List Books in Shelf
+# ----------------------------------------
 
 def list_books_in_shelf(
     db: Session,
     current_user: User,
     shelf_id: int,
 ):
-    shelf = get_shelf(
-        db,
-        current_user,
-        shelf_id,
+    PermissionService.require_viewer(
+        db=db,
+        shelf_id=shelf_id,
+        user_id=current_user.id,
+    )
+
+    shelf = ShelfRepository.get_by_id_without_owner(
+        db=db,
+        shelf_id=shelf_id,
     )
 
     return ShelfRepository.list_books(shelf)

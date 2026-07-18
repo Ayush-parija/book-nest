@@ -7,6 +7,8 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 from app.db.database import Base
 from app.models.shelf import book_shelves
 
+from sqlalchemy import Boolean
+
 
 class BookStatus(str, enum.Enum):
     WANT_TO_READ = "Want to Read"
@@ -75,3 +77,7 @@ class Book(Base):
         secondary=book_shelves,
         back_populates="books",
     )
+
+    is_favorite: Mapped[bool] = mapped_column(
+    Boolean,
+    default=False,)

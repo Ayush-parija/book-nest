@@ -11,6 +11,7 @@ from app.schemas.book import (
     BookCreate,
     BookUpdate,
     BookResponse,
+    ReadingProgressUpdate,
 )
 
 from app.services.book_service import (
@@ -19,6 +20,9 @@ from app.services.book_service import (
     get_books,
     update_book,
     delete_book,
+    update_reading_progress,
+    toggle_favorite,
+    get_favorite_books,
 )
 
 router = APIRouter(
@@ -27,19 +31,20 @@ router = APIRouter(
 )
 
 
-@router.post(
-    "",
-    response_model=BookResponse,
-)
+# =====================================================
+# BOOK CRUD
+# =====================================================
+
+@router.post("")
 def create_new_book(
     data: BookCreate,
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
     return create_book(
-        db,
-        current_user,
-        data,
+        db=db,
+        current_user=current_user,
+        data=data,
     )
 
 
@@ -68,6 +73,23 @@ def list_books(
         order=order,
     )
 
+@router.get(
+    "/favorites",
+    response_model=list[BookResponse],
+)
+def favorite_books(
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    return get_favorite_books(
+        db=db,
+        current_user=current_user,
+    )
+
+
+# =====================================================
+# BOOK CRUD BY ID
+# =====================================================
 
 @router.get(
     "/{book_id}",
@@ -79,9 +101,9 @@ def get_single_book(
     current_user: User = Depends(get_current_user),
 ):
     return get_book(
-        db,
-        current_user,
-        book_id,
+        db=db,
+        current_user=current_user,
+        book_id=book_id,
     )
 
 
@@ -96,10 +118,43 @@ def edit_book(
     current_user: User = Depends(get_current_user),
 ):
     return update_book(
-        db,
-        current_user,
-        book_id,
-        data,
+        db=db,
+        current_user=current_user,
+        book_id=book_id,
+        data=data,
+    )
+
+@router.patch(
+    "/{book_id}/progress",
+    response_model=BookResponse,
+)
+def update_progress(
+    book_id: int,
+    data: ReadingProgressUpdate,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    return update_reading_progress(
+        db=db,
+        current_user=current_user,
+        book_id=book_id,
+        data=data,
+    )
+
+
+@router.patch(
+    "/{book_id}/favorite",
+    response_model=BookResponse,
+)
+def favorite_book(
+    book_id: int,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    return toggle_favorite(
+        db=db,
+        current_user=current_user,
+        book_id=book_id,
     )
 
 
@@ -112,7 +167,7 @@ def remove_book(
     current_user: User = Depends(get_current_user),
 ):
     return delete_book(
-        db,
-        current_user,
-        book_id,
+        db=db,
+        current_user=current_user,
+        book_id=book_id,
     )

@@ -17,6 +17,21 @@ from app.services.auth_service import (
     login_user,
 )
 
+from app.schemas.auth import (
+    LoginRequest,
+    SignupRequest,
+    TokenResponse,
+    RefreshTokenRequest,
+    AccessTokenResponse,
+)
+
+from app.services.auth_service import (
+    create_user,
+    login_user,
+    refresh_access_token,
+    logout_user,
+)
+
 router = APIRouter(
     prefix="/auth",
     tags=["Authentication"],
@@ -60,3 +75,16 @@ def me(
         "name": current_user.name,
         "email": current_user.email,
     }
+
+@router.post(
+    "/refresh",
+    response_model=AccessTokenResponse,
+)
+def refresh_token(
+    data: RefreshTokenRequest,
+):
+    return refresh_access_token(data)
+
+@router.post("/logout")
+def logout():
+    return logout_user()

@@ -1,8 +1,11 @@
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 
-from app.db.dependencies import get_db
+from app.dependencies.database import get_db
 from app.dependencies.auth import get_current_user
+
+from app.schemas.shelf_share import ShelfShareCreate
+from app.services.shelf_share_service import share_shelf
 
 from app.models.user import User
 
@@ -113,6 +116,19 @@ def remove_shelf(
         shelf_id=shelf_id,
     )
 
+@router.post("/{shelf_id}/share")
+def share_shelf_api(
+    shelf_id: int,
+    data: ShelfShareCreate,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    return share_shelf(
+        db=db,
+        current_user=current_user,
+        shelf_id=shelf_id,
+        data=data,
+    )
 
 # -----------------------------
 # Book ↔ Shelf APIs

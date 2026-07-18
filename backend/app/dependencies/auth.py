@@ -7,9 +7,7 @@ from app.dependencies.database import get_db
 from app.models.user import User
 from app.repositories.user_repository import UserRepository
 
-oauth2_scheme = OAuth2PasswordBearer(
-    tokenUrl="/auth/login"
-)
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/login")
 
 
 def get_current_user(
@@ -17,7 +15,10 @@ def get_current_user(
     db: Session = Depends(get_db),
 ) -> User:
 
+    print("TOKEN:", token)
+
     payload = decode_token(token)
+    print("PAYLOAD:", payload)
 
     if payload is None:
         raise HTTPException(
@@ -25,15 +26,12 @@ def get_current_user(
             detail="Invalid token",
         )
 
-    if payload.get("type") != "access":
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Invalid access token",
-        )
+    print("TYPE:", payload.get("type"))
+    print("SUB:", payload.get("sub"))
 
-    user_id = int(payload["sub"])
+    user = UserRepository.get_by_id(int(payload["sub"]), db)
 
-    user = UserRepository.get_by_id(user_id, db)
+    print("USER:", user)
 
     if user is None:
         raise HTTPException(

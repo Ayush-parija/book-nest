@@ -1,8 +1,11 @@
 from sqlalchemy.orm import Session
+from sqlalchemy import or_
 
 from app.models.book import Book
 from app.models.shelf import Shelf
 from app.schemas.shelf import ShelfCreate, ShelfUpdate
+
+from app.models.shelf_share import ShelfShare
 
 
 class ShelfRepository:
@@ -27,11 +30,21 @@ class ShelfRepository:
     @staticmethod
     def get_all(
         db: Session,
-        owner_id: int,
+        user_id: int,
     ):
         return (
             db.query(Shelf)
-            .filter(Shelf.owner_id == owner_id)
+            .outerjoin(
+                ShelfShare,
+                Shelf.id == ShelfShare.shelf_id,
+            )
+            .filter(
+                or_(
+                    Shelf.owner_id == user_id,
+                    ShelfShare.user_id == user_id,
+                )
+            )
+            .distinct()
             .all()
         )
 
@@ -109,3 +122,46 @@ class ShelfRepository:
         shelf: Shelf,
     ):
         return shelf.books
+    
+    @staticmethod
+    def get_by_id_without_owner(
+    db: Session,
+    shelf_id: int,
+    ):
+        return (
+            db.query(Shelf)
+            .filter(
+                Shelf.id == shelf_id,
+            )
+            .first()
+        )
+    
+    @staticmethod
+    def get_owned_shelves(
+        db: Session,
+        owner_id: int,
+    ):
+        return (
+            db.query(Shelf)
+            .filter(
+                Shelf.owner_id == owner_id,
+            )
+            .all()
+        )
+    
+    @staticmethod
+    def get_shared_shelves(
+        db: Session,
+        user_id: int,
+    ):
+        return (
+            db.query(Shelf)
+            .join(
+                ShelfShare,
+                Shelf.id == ShelfShare.shelf_id,
+            )
+            .filter(
+                ShelfShare.user_id == user_id,
+            )
+            .all()
+        )

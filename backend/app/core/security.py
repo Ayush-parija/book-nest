@@ -51,5 +51,6 @@ def decode_token(token: str):
             settings.secret_key,
             algorithms=[ALGORITHM],
         )
-    except JWTError:
+    except JWTError as e:
+        print("JWT ERROR:", str(e))
         return None

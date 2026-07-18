@@ -1,4 +1,5 @@
 from datetime import datetime
+from app.models.shelf_share import ShelfShare
 
 from sqlalchemy import (
     Column,
@@ -58,4 +59,10 @@ class Shelf(Base):
         "Book",
         secondary=book_shelves,
         back_populates="shelves",
+    )
+
+    shares: Mapped[list["ShelfShare"]] = relationship(
+    "ShelfShare",
+    back_populates="shelf",
+    cascade="all, delete-orphan",
     )
