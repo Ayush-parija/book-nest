@@ -32,17 +32,26 @@ function ReadingProgress() {
 
   const handleProgressChange = async (bookId, currentPage) => {
     try {
-      await updateReadingProgress(bookId, {
+      const updatedBook = await updateReadingProgress(bookId, {
         current_page: Number(currentPage),
       });
-      // Optionally just update the local state instead of refetching all books
-      // to avoid jumping inputs
-      setBooks(books.map(b => 
-        b.id === bookId ? { ...b, current_page: Number(currentPage) } : b
+      // Use the full response from the backend so status & finished_at update
+      setBooks(books.map(b =>
+        b.id === bookId ? { ...b, ...updatedBook } : b
       ));
+
+      if (updatedBook.status === "Finished") {
+        alert(`🎉 Congratulations! You finished "${updatedBook.title}"!`);
+      }
     } catch (error) {
       console.error(error);
-      alert("Failed to update progress.");
+      const detail = error.response?.data?.detail;
+      const msg = typeof detail === "string"
+        ? detail
+        : Array.isArray(detail) ? detail[0]?.msg : "Failed to update progress.";
+      alert(msg);
+      // Revert local state on error
+      fetchBooks();
     }
   };
 
@@ -53,6 +62,15 @@ function ReadingProgress() {
       </div>
     );
   }
+
+  const statusBadge = (status) => {
+    const colors = {
+      "Want to Read": "bg-warning text-dark",
+      "Reading": "bg-info text-dark",
+      "Finished": "bg-success",
+    };
+    return colors[status] || "bg-secondary";
+  };
 
   return (
     <div className="container mt-4">
@@ -79,7 +97,18 @@ function ReadingProgress() {
                     <h5 className="card-title fw-bold text-primary text-truncate" title={book.title}>
                       {book.title}
                     </h5>
-                    <h6 className="card-subtitle mb-3 text-muted">by {book.author}</h6>
+                    <h6 className="card-subtitle mb-2 text-muted">by {book.author}</h6>
+
+                    <div className="mb-3">
+                      <span className={`badge ${statusBadge(book.status)}`}>
+                        {book.status}
+                      </span>
+                      {book.finished_at && (
+                        <small className="text-muted ms-2">
+                          ✅ Finished on {new Date(book.finished_at).toLocaleDateString()}
+                        </small>
+                      )}
+                    </div>
 
                     <div className="mb-2 d-flex justify-content-between align-items-center">
                       <small>Progress: {currentPage} / {totalPages || '?'} pages</small>
@@ -88,7 +117,7 @@ function ReadingProgress() {
 
                     <div className="progress mb-4" style={{ height: "10px", backgroundColor: "#3a3a3a" }}>
                       <div 
-                        className="progress-bar bg-success" 
+                        className={`progress-bar ${percentage >= 100 ? 'bg-success' : 'bg-info'}`}
                         role="progressbar" 
                         style={{ width: `${percentage}%` }}
                         aria-valuenow={percentage} 
