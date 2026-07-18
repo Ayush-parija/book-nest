@@ -180,7 +180,7 @@ def add_book_to_shelf(
     book = BookRepository.get_by_id(
         db=db,
         book_id=book_id,
-        owner_id=shelf.owner_id,
+        owner_id=current_user.id,
     )
 
     if not book:
@@ -229,7 +229,6 @@ def remove_book_from_shelf(
     book = BookRepository.get_by_id(
         db=db,
         book_id=book_id,
-        owner_id=shelf.owner_id,
     )
 
     if not book:
