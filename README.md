@@ -62,14 +62,19 @@ Ensure you have the following installed on your local machine:
 
 ## Architecture & Data Model
 
-BookNest follows a relational data model with the following core entities:
+BookNest follows a relational data model designed for scalability and real-time updates. Below is the core architecture:
 
-- **Users**: Authentication (hashed passwords) and profiles.
-- **Books**: The core item being tracked (title, author, progress, rating).
-- **Shelves**: Custom groupings of books created by a user.
-- **ShelfShares**: A join table linking Users to Shelves they don't own, with explicit `ShelfRole` enums (`OWNER`, `EDITOR`, `VIEWER`).
-- **Lendings**: A record indicating a Book is temporarily with another User (tracks `lent_at` and `returned_at`).
-- **Activity**: An audit log of all significant events (book created, shelf updated, lending initiated).
+| 🏗️ Entity | 📖 Description | 🔑 Key Relationships |
+|:---|:---|:---|
+| **Users** | Authentication (hashed passwords) and profiles. | Owns `Books`, `Shelves`. Generates `Activities`. |
+| **Books** | The core item being tracked (title, author, progress, rating). | Placed in `Shelves`. Can be `Lent`. |
+| **Shelves** | Custom groupings of books created by a user. | Shared via `ShelfShares`. |
+| **ShelfShares** | Join table linking Users to Shelves they don't own. | Tracks `ShelfRole` (OWNER, EDITOR, VIEWER). |
+| **Lendings** | Record indicating a Book is temporarily with another User. | Tracks `lent_at` and `returned_at`. |
+| **Activity** | Audit log of all significant events. | Used for WebSocket notifications. |
+
+> [!NOTE]
+> All relationships are strictly enforced at the database level using SQLAlchemy foreign keys and cascade rules.
 
 ```mermaid
 erDiagram
