@@ -8,3 +8,5 @@ class StatsResponse(BaseModel):
     finished: int
     total_pages_read: int
     average_rating: float
+    finished_this_year: int
+    largest_shelf: str | None = None

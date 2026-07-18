@@ -79,6 +79,26 @@ function Dashboard() {
           value={dashboard.statistics.average_rating}
         />
 
+        <DashboardCard
+          title="Finished This Year"
+          value={dashboard.statistics.finished_this_year}
+        />
+
+        <DashboardCard
+          title="Largest Shelf"
+          value={dashboard.statistics.largest_shelf}
+        />
+
+        <DashboardCard
+          title="Books Lent Out"
+          value={dashboard.lent_books?.length || 0}
+        />
+
+        <DashboardCard
+          title="Shared Shelves"
+          value={dashboard.shared_shelves?.length || 0}
+        />
+
       </div>
 
       <hr />
@@ -143,6 +163,26 @@ function Dashboard() {
             </div>
           ))
         )}
+      </div>
+
+      <hr />
+
+      <h3>📝 Recent Activity</h3>
+      <div className="row">
+        <div className="col-12">
+          {(!dashboard.activity_feed || dashboard.activity_feed.length === 0) ? (
+            <p>No recent activity.</p>
+          ) : (
+            <ul className="list-group list-group-flush bg-transparent">
+              {dashboard.activity_feed.map((activity) => (
+                <li key={activity.id} className="list-group-item bg-dark text-light border-secondary d-flex justify-content-between align-items-center mb-2" style={{ borderRadius: '8px' }}>
+                  <span>{activity.message}</span>
+                  <small className="text-muted">{new Date(activity.created_at).toLocaleString()}</small>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
       </div>
     </div>
   );
