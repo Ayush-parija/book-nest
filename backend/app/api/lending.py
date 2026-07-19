@@ -1,16 +1,21 @@
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 
+# Database session dependency
 from app.db.dependencies import get_db
+
+# Dependency to get the currently authenticated user
 from app.dependencies.auth import get_current_user
 from app.models.user import User
 
+# Request and response schemas for lending operations
 from app.schemas.lending import (
     LendBookRequest,
     LendingResponse,
     ReturnBookResponse,
 )
 
+# Service functions that handle lending business logic
 from app.services.lending_service import (
     lend_book,
     return_book,
@@ -18,12 +23,14 @@ from app.services.lending_service import (
     get_lent_books,
 )
 
+# Router for all lending-related endpoints
 router = APIRouter(
     prefix="/lending",
     tags=["Lending"],
 )
 
 
+# Get the list of books borrowed by the current user
 @router.get("/borrowed")
 def borrowed_books(
     db: Session = Depends(get_db),
@@ -35,6 +42,7 @@ def borrowed_books(
     )
 
 
+# Get the list of books the current user has lent to others
 @router.get("/lent")
 def lent_books(
     db: Session = Depends(get_db),
@@ -46,6 +54,7 @@ def lent_books(
     )
 
 
+# Lend a book to another user
 @router.post(
     "/books/{book_id}/lend",
     response_model=LendingResponse,
@@ -64,6 +73,7 @@ def lend(
     )
 
 
+# Mark a previously lent book as returned
 @router.post(
     "/books/{book_id}/return",
     response_model=ReturnBookResponse,

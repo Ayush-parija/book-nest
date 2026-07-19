@@ -1,11 +1,16 @@
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 
+# Dependency to get the currently logged-in user
 from app.dependencies.auth import get_current_user
+
+# Database session dependency
 from app.dependencies.database import get_db
 
+# User model
 from app.models.user import User
 
+# Request and response schemas for shelf sharing
 from app.schemas.shelf_share import (
     ShelfShareCreate,
     ShelfShareUpdate,
@@ -13,6 +18,7 @@ from app.schemas.shelf_share import (
     ShelfCollaboratorResponse,
 )
 
+# Service functions for shelf sharing operations
 from app.services.shelf_share_service import (
     share_shelf,
     update_share_role,
@@ -21,12 +27,14 @@ from app.services.shelf_share_service import (
     get_collaborators,
 )
 
+# Router for shared shelf related APIs
 # shelf_share.py
 router = APIRouter(
     prefix="/shared-shelves",
     tags=["Shared Shelves"],
 )
 
+# Get all shelves that have been shared with the current user
 @router.get(
     "/shared",
     response_model=list[SharedShelfResponse],
@@ -40,6 +48,7 @@ def shared(
         current_user=current_user,
     )
 
+# Get the list of collaborators for a specific shelf
 @router.get(
     "/{shelf_id}/collaborators",
     response_model=list[ShelfCollaboratorResponse],
@@ -55,6 +64,7 @@ def get_shelf_collaborators(
         shelf_id=shelf_id,
     )
 
+# Share a shelf with another user
 @router.post("/{shelf_id}/share")
 def share(
     shelf_id: int,
@@ -70,6 +80,7 @@ def share(
     )
 
 
+# Update the role of an existing collaborator
 @router.patch("/{shelf_id}/share/{collaborator_id}")
 def update_role(
     shelf_id: int,
@@ -87,6 +98,7 @@ def update_role(
     )
 
 
+# Remove a collaborator from the shared shelf
 @router.delete("/{shelf_id}/share/{collaborator_id}")
 def remove(
     shelf_id: int,
@@ -100,5 +112,3 @@ def remove(
         shelf_id=shelf_id,
         collaborator_id=collaborator_id,
     )
-
-

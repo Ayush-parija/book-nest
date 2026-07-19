@@ -1,12 +1,17 @@
 from fastapi import APIRouter, Depends, Query
 from sqlalchemy.orm import Session
 
+# Database session dependency
 from app.db.dependencies import get_db
+
+# Dependency to get the currently logged-in user
 from app.dependencies.auth import get_current_user
 
+# Book status enum
 from app.models.enums import BookStatus
 from app.models.user import User
 
+# Request and response schemas
 from app.schemas.book import (
     BookCreate,
     BookUpdate,
@@ -14,6 +19,7 @@ from app.schemas.book import (
     ReadingProgressUpdate,
 )
 
+# Business logic for book operations
 from app.services.book_service import (
     create_book,
     get_book,
@@ -25,6 +31,7 @@ from app.services.book_service import (
     get_favorite_books,
 )
 
+# Router for all book-related APIs
 router = APIRouter(
     prefix="/books",
     tags=["Books"],
@@ -35,6 +42,7 @@ router = APIRouter(
 # BOOK CRUD
 # =====================================================
 
+# Create a new book for the logged-in user
 @router.post("")
 def create_new_book(
     data: BookCreate,
@@ -48,6 +56,7 @@ def create_new_book(
     )
 
 
+# Get all books with pagination, filtering, searching and sorting
 @router.get(
     "",
     response_model=list[BookResponse],
@@ -73,6 +82,8 @@ def list_books(
         order=order,
     )
 
+
+# Return only the user's favorite books
 @router.get(
     "/favorites",
     response_model=list[BookResponse],
@@ -91,6 +102,7 @@ def favorite_books(
 # BOOK CRUD BY ID
 # =====================================================
 
+# Get details of a specific book
 @router.get(
     "/{book_id}",
     response_model=BookResponse,
@@ -107,6 +119,7 @@ def get_single_book(
     )
 
 
+# Update the details of an existing book
 @router.patch(
     "/{book_id}",
     response_model=BookResponse,
@@ -124,6 +137,8 @@ def edit_book(
         data=data,
     )
 
+
+# Update the current reading progress of a book
 @router.patch(
     "/{book_id}/progress",
     response_model=BookResponse,
@@ -142,6 +157,7 @@ def update_progress(
     )
 
 
+# Mark or unmark a book as favorite
 @router.patch(
     "/{book_id}/favorite",
     response_model=BookResponse,
@@ -158,6 +174,7 @@ def favorite_book(
     )
 
 
+# Delete a book owned by the current user
 @router.delete(
     "/{book_id}",
 )
