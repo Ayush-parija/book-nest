@@ -1,21 +1,28 @@
 import { Link } from "react-router-dom";
 
+// Main page for managing book lending activities
 function Lending() {
   return (
     <div className="container mt-4">
+
       <div className="d-flex justify-content-between align-items-center mb-4">
+
+        {/* Page heading */}
         <h2>📚 Lending</h2>
 
+        {/* Navigate to the create lending page */}
         <Link
           to="/lending/new"
           className="btn btn-primary"
         >
           ➕ Lend Book
         </Link>
+
       </div>
 
       <div className="row">
 
+        {/* Borrowed books section */}
         <div className="col-md-6 mb-3">
           <div className="card shadow-sm">
             <div className="card-body">
@@ -37,6 +44,7 @@ function Lending() {
           </div>
         </div>
 
+        {/* Lent books section */}
         <div className="col-md-6 mb-3">
           <div className="card shadow-sm">
             <div className="card-body">
@@ -59,6 +67,7 @@ function Lending() {
         </div>
 
       </div>
+
     </div>
   );
 }

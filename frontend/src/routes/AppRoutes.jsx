@@ -19,7 +19,7 @@ import ShelfDetails from "../pages/ShelfDetails";
 import AddBookToShelf from "../pages/AddBookToShelf";
 import ShareShelf from "../pages/ShareShelf";
 
-// ✅ Lending Imports
+// Lending page imports
 import Lending from "../pages/Lending";
 import AddLending from "../pages/AddLending";
 import BorrowedBooks from "../pages/BorrowedBooks";
@@ -28,16 +28,17 @@ import LentBooks from "../pages/LentBooks";
 import Activity from "../pages/Activity";
 import ReadingProgress from "../pages/ReadingProgress";
 
-
+// Defines all application routes
 function AppRoutes() {
   return (
     <Routes>
-      {/* Authentication */}
+
+      {/* Authentication routes */}
       <Route path="/" element={<Login />} />
       <Route path="/login" element={<Login />} />
       <Route path="/signup" element={<Signup />} />
 
-      {/* Dashboard */}
+      {/* Dashboard route */}
       <Route
         path="/dashboard"
         element={
@@ -47,7 +48,7 @@ function AppRoutes() {
         }
       />
 
-      {/* Books */}
+      {/* Book management routes */}
       <Route
         path="/books"
         element={
@@ -75,7 +76,7 @@ function AppRoutes() {
         }
       />
 
-      {/* Favorites */}
+      {/* Favorite books route */}
       <Route
         path="/favorites"
         element={
@@ -86,7 +87,7 @@ function AppRoutes() {
       />
 
       {/* ========================= */}
-      {/* Shelves */}
+      {/* Shelf management routes */}
       {/* ========================= */}
 
       <Route
@@ -144,7 +145,7 @@ function AppRoutes() {
       />
 
       {/* ========================= */}
-      {/* Lending */}
+      {/* Book lending routes */}
       {/* ========================= */}
 
       <Route
@@ -182,6 +183,8 @@ function AppRoutes() {
           </Layout>
         }
       />
+
+      {/* Activity history route */}
       <Route
         path="/activity"
         element={
@@ -191,6 +194,7 @@ function AppRoutes() {
         }
       />
 
+      {/* Reading progress tracking route */}
       <Route
         path="/reading-progress"
         element={
@@ -200,8 +204,9 @@ function AppRoutes() {
         }
       />
 
-      {/* Redirect unknown routes */}
+      {/* Redirect all unknown routes to the login page */}
       <Route path="*" element={<Navigate to="/" replace />} />
+
     </Routes>
   );
 }

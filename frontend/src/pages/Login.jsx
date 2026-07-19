@@ -2,27 +2,35 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { loginUser } from "../services/authService";
 
+// Login page for existing users
 function Login() {
+  // Used for page navigation after successful login
   const navigate = useNavigate();
 
+  // Store the user's email
   const [email, setEmail] = useState("");
+
+  // Store the user's password
   const [password, setPassword] = useState("");
 
+  // Authenticate the user
   const handleLogin = async () => {
     try {
       const data = await loginUser(email, password);
 
-      // access_token is stored in sessionStorage for request headers
-      // This allows testing multiple users in different tabs
+      // Store the access token for authenticated requests
+      // This allows testing multiple users in different browser tabs
       sessionStorage.setItem("access_token", data.access_token);
       
-      // Explicitly connect to WebSocket after login
+      // Establish the WebSocket connection after login
       import("../services/websocketService").then(m => m.default.connect());
 
+      // Redirect to the dashboard
       navigate("/dashboard");
     } catch (error) {
       console.error(error);
 
+      // Display the appropriate login error
       if (error.response) {
         alert(error.response.data.detail || "Login Failed");
       } else {
@@ -49,6 +57,7 @@ function Login() {
           padding: "40px",
         }}
       >
+        {/* Application title */}
         <div className="text-center mb-4">
           <h1
             style={{
@@ -61,6 +70,7 @@ function Login() {
           </h1>
         </div>
 
+        {/* Email input */}
         <div className="mb-3">
           <label className="form-label">Email</label>
 
@@ -73,6 +83,7 @@ function Login() {
           />
         </div>
 
+        {/* Password input */}
         <div className="mb-4">
           <label className="form-label">Password</label>
 
@@ -85,6 +96,7 @@ function Login() {
           />
         </div>
 
+        {/* Login button */}
         <button
           className="btn btn-primary w-100"
           onClick={handleLogin}
@@ -92,6 +104,7 @@ function Login() {
           Login
         </button>
 
+        {/* Link to the registration page */}
         <div className="text-center mt-4">
           <span style={{ color: "#bdbdbd" }}>
             Don't have an account?

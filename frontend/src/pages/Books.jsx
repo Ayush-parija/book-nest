@@ -6,22 +6,38 @@ import {
   toggleFavorite,
 } from "../services/bookService";
 
+// Displays the user's book collection with search, filter, sorting, and pagination
 function Books() {
+  // Store the list of books
   const [books, setBooks] = useState([]);
+
+  // Track loading state
   const [loading, setLoading] = useState(true);
 
+  // Search keyword
   const [search, setSearch] = useState("");
+
+  // Selected book status filter
   const [status, setStatus] = useState("");
+
+  // Selected sorting field
   const [sortBy, setSortBy] = useState("created_at");
+
+  // Sorting order
   const [order, setOrder] = useState("desc");
 
+  // Current page number
   const [page, setPage] = useState(1);
+
+  // Number of books displayed per page
   const pageSize = 10;
 
+  // Reload books whenever filters or pagination change
   useEffect(() => {
     loadBooks();
   }, [page, search, status, sortBy, order]);
 
+  // Fetch books from the backend
   const loadBooks = async () => {
     try {
       setLoading(true);
@@ -40,15 +56,19 @@ function Books() {
       console.error(error);
       alert("Failed to load books");
     } finally {
+      // Stop the loading indicator
       setLoading(false);
     }
   };
 
+  // Delete a selected book
   const handleDelete = async (id) => {
     if (!window.confirm("Delete this book?")) return;
 
     try {
       await deleteBook(id);
+
+      // Refresh the book list
       loadBooks();
     } catch (error) {
       console.error(error);
@@ -56,9 +76,12 @@ function Books() {
     }
   };
 
+  // Toggle the favorite status of a book
   const handleFavorite = async (id) => {
     try {
       await toggleFavorite(id);
+
+      // Refresh the updated list
       loadBooks();
     } catch (error) {
       console.error(error);
@@ -70,15 +93,20 @@ function Books() {
     <div className="container mt-4">
 
       <div className="d-flex justify-content-between align-items-center mb-4">
+
+        {/* Page title */}
         <h2>📚 My Books</h2>
 
+        {/* Navigate to the Add Book page */}
         <Link to="/books/add" className="btn btn-primary">
           + Add Book
         </Link>
       </div>
 
+      {/* Search, filter, and sorting controls */}
       <div className="row mb-4">
 
+        {/* Search by title or author */}
         <div className="col-md-4">
           <input
             className="form-control"
@@ -91,6 +119,7 @@ function Books() {
           />
         </div>
 
+        {/* Filter books by reading status */}
         <div className="col-md-3">
           <select
             className="form-select"
@@ -107,6 +136,7 @@ function Books() {
           </select>
         </div>
 
+        {/* Select the sorting field */}
         <div className="col-md-3">
           <select
             className="form-select"
@@ -119,6 +149,7 @@ function Books() {
           </select>
         </div>
 
+        {/* Toggle sorting order */}
         <div className="col-md-2">
           <button
             className="btn btn-outline-secondary w-100"
@@ -132,6 +163,7 @@ function Books() {
 
       </div>
 
+      {/* Display loading state or book list */}
       {loading ? (
         <h4>Loading...</h4>
       ) : (
@@ -151,6 +183,7 @@ function Books() {
 
           <tbody>
 
+            {/* Show a message if no books are available */}
             {books.length === 0 ? (
               <tr>
                 <td colSpan="7" className="text-center">
@@ -158,6 +191,7 @@ function Books() {
                 </td>
               </tr>
             ) : (
+              // Display each book
               books.map((book) => (
                 <tr key={book.id}>
 
@@ -176,6 +210,7 @@ function Books() {
                   </td>
 
                   <td>
+                    {/* Toggle favorite status */}
                     <button
                       className="btn btn-sm"
                       onClick={() => handleFavorite(book.id)}
@@ -186,6 +221,7 @@ function Books() {
 
                   <td>
 
+                    {/* Edit the selected book */}
                     <Link
                       to={`/books/edit/${book.id}`}
                       className="btn btn-warning btn-sm me-2"
@@ -193,6 +229,7 @@ function Books() {
                       Edit
                     </Link>
 
+                    {/* Delete the selected book */}
                     <button
                       className="btn btn-danger btn-sm"
                       onClick={() => handleDelete(book.id)}
@@ -211,6 +248,7 @@ function Books() {
         </table>
       )}
 
+      {/* Pagination controls */}
       <div className="d-flex justify-content-center">
 
         <button

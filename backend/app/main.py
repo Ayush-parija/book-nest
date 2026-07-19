@@ -33,7 +33,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-# Routers
+# API router imports
 from app.api.auth import router as auth_router
 from app.api.user import router as users_router
 from app.api.book import router as book_router
@@ -45,10 +45,10 @@ from app.api.dashboard import router as dashboard_router
 from app.api.activity import router as activity_router
 from app.api.websocket import router as websocket_router
 
-# Database
+# Database configuration
 from app.db.database import Base, engine
 
-# Models
+# Import models so SQLAlchemy can create their tables
 from app.models.user import User
 from app.models.book import Book
 from app.models.shelf import Shelf
@@ -56,13 +56,15 @@ from app.models.shelf_share import ShelfShare
 from app.models.lending import Lending
 from app.models.activity import Activity
 
-# Create database tables
+# Create all database tables if they do not already exist
 Base.metadata.create_all(bind=engine)
 
 import os
 
+# Check whether the application is running in production
 IS_PRODUCTION = os.getenv("ENVIRONMENT") == "production"
 
+# Create the FastAPI application
 app = FastAPI(
     title="BookNest API",
     version="1.0.0",
@@ -74,6 +76,8 @@ app = FastAPI(
 # =========================
 # CORS Configuration
 # =========================
+
+# Allow frontend applications to communicate with the backend
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
@@ -90,6 +94,8 @@ app.add_middleware(
 # =========================
 # Include Routers
 # =========================
+
+# Register all API endpoints with the application
 app.include_router(auth_router)
 app.include_router(users_router)
 app.include_router(book_router)

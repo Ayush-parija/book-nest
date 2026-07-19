@@ -4,15 +4,23 @@ import DashboardCard from "../components/DashboardCard";
 import BookCard from "../components/BookCard";
 import ShelfCard from "../components/ShelfCard";
 
+// Dashboard page displaying an overview of the user's library
 function Dashboard() {
+  // Store dashboard data
   const [dashboard, setDashboard] = useState(null);
+
+  // Track loading state
   const [loading, setLoading] = useState(true);
+
+  // Store any loading error
   const [error, setError] = useState("");
 
+  // Load dashboard data when the page is opened
   useEffect(() => {
     fetchDashboard();
   }, []);
 
+  // Fetch dashboard information from the backend
   const fetchDashboard = async () => {
     try {
       const data = await getDashboard();
@@ -21,10 +29,12 @@ function Dashboard() {
       console.error(err);
       setError("Failed to load dashboard.");
     } finally {
+      // Stop the loading indicator
       setLoading(false);
     }
   };
 
+  // Display a loading message while data is being fetched
   if (loading) {
     return (
       <div className="container mt-5">
@@ -33,6 +43,7 @@ function Dashboard() {
     );
   }
 
+  // Display an error message if loading fails
   if (error) {
     return (
       <div className="container mt-5">
@@ -43,10 +54,13 @@ function Dashboard() {
 
   return (
     <div className="container mt-4">
+
+      {/* Welcome message */}
       <h2 className="mb-4">
         Welcome, {dashboard.user.name} 👋
       </h2>
 
+      {/* Dashboard summary cards */}
       <div className="row">
 
         <DashboardCard
@@ -103,6 +117,7 @@ function Dashboard() {
 
       <hr />
 
+      {/* Currently reading books */}
       <h3>📖 Currently Reading</h3>
 
       <div className="row">
@@ -119,6 +134,7 @@ function Dashboard() {
 
       <hr />
 
+      {/* Favorite books */}
       <h3>⭐ Favorite Books</h3>
 
       <div className="row">
@@ -135,6 +151,7 @@ function Dashboard() {
 
       <hr />
 
+      {/* Recently added books */}
       <h3>🕒 Recent Books</h3>
 
       <div className="row">
@@ -151,6 +168,7 @@ function Dashboard() {
 
       <hr />
 
+      {/* User's shelves */}
       <h3>📂 My Shelves</h3>
 
       <div className="row">
@@ -167,7 +185,9 @@ function Dashboard() {
 
       <hr />
 
+      {/* Recent activity feed */}
       <h3>📝 Recent Activity</h3>
+
       <div className="row">
         <div className="col-12">
           {(!dashboard.activity_feed || dashboard.activity_feed.length === 0) ? (
@@ -175,15 +195,24 @@ function Dashboard() {
           ) : (
             <ul className="list-group list-group-flush bg-transparent">
               {dashboard.activity_feed.map((activity) => (
-                <li key={activity.id} className="list-group-item bg-dark text-light border-secondary d-flex justify-content-between align-items-center mb-2" style={{ borderRadius: '8px' }}>
+                <li
+                  key={activity.id}
+                  className="list-group-item bg-dark text-light border-secondary d-flex justify-content-between align-items-center mb-2"
+                  style={{ borderRadius: '8px' }}
+                >
                   <span>{activity.message}</span>
-                  <small className="text-muted">{new Date(activity.created_at).toLocaleString()}</small>
+
+                  {/* Activity timestamp */}
+                  <small className="text-muted">
+                    {new Date(activity.created_at).toLocaleString()}
+                  </small>
                 </li>
               ))}
             </ul>
           )}
         </div>
       </div>
+
     </div>
   );
 }

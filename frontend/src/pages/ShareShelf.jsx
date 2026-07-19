@@ -3,17 +3,28 @@ import { useNavigate, useParams } from "react-router-dom";
 
 import { shareShelf } from "../services/shelfService";
 
+// Page for sharing a shelf with another user
 function ShareShelf() {
+  // Get the shelf ID from the route
   const { id } = useParams();
+
+  // Used for page navigation
   const navigate = useNavigate();
 
+  // Store the recipient's email
   const [email, setEmail] = useState("");
+
+  // Store the selected permission level
   const [role, setRole] = useState("viewer");
+
+  // Track the sharing request state
   const [loading, setLoading] = useState(false);
 
+  // Share the selected shelf with another user
   const handleShare = async (e) => {
     e.preventDefault();
 
+    // Validate that an email has been entered
     if (!email.trim()) {
       alert("Please enter an email address.");
       return;
@@ -22,6 +33,7 @@ function ShareShelf() {
     try {
       setLoading(true);
 
+      // Send the sharing request to the backend
       await shareShelf(id, {
         email: email.trim(),
         role,
@@ -29,6 +41,7 @@ function ShareShelf() {
 
       alert("Shelf shared successfully!");
 
+      // Return to the shelf details page
       navigate(`/shelves/${id}`);
     } catch (error) {
       console.error(error);
@@ -38,6 +51,7 @@ function ShareShelf() {
           "Failed to share shelf."
       );
     } finally {
+      // Reset the loading state
       setLoading(false);
     }
   };
@@ -51,6 +65,7 @@ function ShareShelf() {
 
           <div className="card shadow">
 
+            {/* Page header */}
             <div className="card-header bg-success text-white">
               <h3 className="mb-0">
                 👥 Share Shelf
@@ -59,6 +74,7 @@ function ShareShelf() {
 
             <div className="card-body">
 
+              {/* Shelf sharing form */}
               <form onSubmit={handleShare}>
 
                 <div className="mb-3">
@@ -107,6 +123,7 @@ function ShareShelf() {
 
                 <div className="d-flex justify-content-between">
 
+                  {/* Cancel and return to the shelf page */}
                   <button
                     type="button"
                     className="btn btn-secondary"
@@ -118,6 +135,7 @@ function ShareShelf() {
                     Cancel
                   </button>
 
+                  {/* Submit the sharing request */}
                   <button
                     type="submit"
                     className="btn btn-success"

@@ -2,9 +2,12 @@ import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { signupUser } from "../services/authService";
 
+// Registration page for creating a new user account
 function Signup() {
+  // Used for page navigation
   const navigate = useNavigate();
 
+  // Store all signup form fields
   const [form, setForm] = useState({
     name: "",
     email: "",
@@ -12,9 +15,13 @@ function Signup() {
     confirmPassword: "",
   });
 
+  // Store validation errors
   const [errors, setErrors] = useState({});
+
+  // Track signup request state
   const [loading, setLoading] = useState(false);
 
+  // Update form values as the user types
   const handleChange = (e) => {
     setForm({
       ...form,
@@ -22,6 +29,7 @@ function Signup() {
     });
   };
 
+  // Validate the signup form before submission
   const validate = () => {
     const newErrors = {};
 
@@ -29,6 +37,7 @@ function Signup() {
       newErrors.name = "Name is required";
     }
 
+    // Validate email format
     if (!form.email.trim()) {
       newErrors.email = "Email is required";
     } else if (
@@ -37,10 +46,12 @@ function Signup() {
       newErrors.email = "Invalid email address";
     }
 
+    // Ensure password meets the minimum length
     if (form.password.length < 8) {
       newErrors.password = "Password must be at least 8 characters";
     }
 
+    // Verify that both password fields match
     if (form.password !== form.confirmPassword) {
       newErrors.confirmPassword = "Passwords do not match";
     }
@@ -50,6 +61,7 @@ function Signup() {
     return Object.keys(newErrors).length === 0;
   };
 
+  // Submit the signup request
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -58,6 +70,7 @@ function Signup() {
     try {
       setLoading(true);
 
+      // Send user registration data to the backend
       await signupUser({
         name: form.name,
         email: form.email,
@@ -66,7 +79,7 @@ function Signup() {
 
       alert("Signup Successful!");
 
-      // If your Login page is "/"
+      // Redirect the user to the login page
       navigate("/");
 
       // If you have "/login" route, replace with:
@@ -79,16 +92,21 @@ function Signup() {
           "Signup failed"
       );
     } finally {
+      // Reset the loading state
       setLoading(false);
     }
   };
 
   return (
     <div className="container mt-5" style={{ maxWidth: "450px" }}>
+
+      {/* Page heading */}
       <h2 className="mb-4">Create Account</h2>
 
+      {/* Signup form */}
       <form onSubmit={handleSubmit}>
 
+        {/* Name input */}
         <div className="mb-3">
           <label>Name</label>
           <input
@@ -101,6 +119,7 @@ function Signup() {
           <small className="text-danger">{errors.name}</small>
         </div>
 
+        {/* Email input */}
         <div className="mb-3">
           <label>Email</label>
           <input
@@ -113,6 +132,7 @@ function Signup() {
           <small className="text-danger">{errors.email}</small>
         </div>
 
+        {/* Password input */}
         <div className="mb-3">
           <label>Password</label>
           <input
@@ -125,6 +145,7 @@ function Signup() {
           <small className="text-danger">{errors.password}</small>
         </div>
 
+        {/* Confirm password input */}
         <div className="mb-3">
           <label>Confirm Password</label>
           <input
@@ -139,6 +160,7 @@ function Signup() {
           </small>
         </div>
 
+        {/* Submit button */}
         <button
           type="submit"
           className="btn btn-primary w-100"
@@ -149,6 +171,7 @@ function Signup() {
 
       </form>
 
+      {/* Link to the login page */}
       <p className="mt-3">
         Already have an account?{" "}
         <Link to="/">Login</Link>

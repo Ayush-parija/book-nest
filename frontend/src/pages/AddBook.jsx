@@ -2,11 +2,14 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { createBook } from "../services/bookService";
 
+// Page for adding a new book to the user's library
 function AddBook() {
   const navigate = useNavigate();
 
+  // Tracks the submit state
   const [loading, setLoading] = useState(false);
 
+  // Form input values
   const [formData, setFormData] = useState({
     title: "",
     author: "",
@@ -16,6 +19,7 @@ function AddBook() {
     notes: "",
   });
 
+  // Update form values when the user types
   const handleChange = (e) => {
     setFormData((prev) => ({
       ...prev,
@@ -23,14 +27,17 @@ function AddBook() {
     }));
   };
 
+  // Submit the new book details
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    // Validate the title field
     if (!formData.title.trim()) {
       alert("Title is required");
       return;
     }
 
+    // Validate the author field
     if (!formData.author.trim()) {
       alert("Author is required");
       return;
@@ -39,6 +46,7 @@ function AddBook() {
     try {
       setLoading(true);
 
+      // Send the book data to the backend
       await createBook({
         title: formData.title.trim(),
         author: formData.author.trim(),
@@ -54,6 +62,7 @@ function AddBook() {
 
       alert("Book added successfully!");
 
+      // Redirect to the books page
       navigate("/books");
     } catch (error) {
       console.error(error);
@@ -68,6 +77,7 @@ function AddBook() {
         alert(error.message);
       }
     } finally {
+      // Reset the loading state
       setLoading(false);
     }
   };
@@ -82,6 +92,7 @@ function AddBook() {
         <div className="card-body">
           <form onSubmit={handleSubmit}>
 
+            {/* Book title */}
             <div className="mb-3">
               <label className="form-label">Title</label>
               <input
@@ -94,6 +105,7 @@ function AddBook() {
               />
             </div>
 
+            {/* Book author */}
             <div className="mb-3">
               <label className="form-label">Author</label>
               <input
@@ -106,6 +118,7 @@ function AddBook() {
               />
             </div>
 
+            {/* Reading status */}
             <div className="mb-3">
               <label className="form-label">Status</label>
               <select
@@ -120,6 +133,7 @@ function AddBook() {
               </select>
             </div>
 
+            {/* Total number of pages */}
             <div className="mb-3">
               <label className="form-label">Total Pages</label>
               <input
@@ -132,6 +146,7 @@ function AddBook() {
               />
             </div>
 
+            {/* Book rating */}
             <div className="mb-3">
               <label className="form-label">Rating</label>
               <input
@@ -145,6 +160,7 @@ function AddBook() {
               />
             </div>
 
+            {/* Additional notes */}
             <div className="mb-3">
               <label className="form-label">Notes</label>
               <textarea
@@ -156,6 +172,7 @@ function AddBook() {
               />
             </div>
 
+            {/* Save button */}
             <button
               type="submit"
               className="btn btn-success me-2"
@@ -164,6 +181,7 @@ function AddBook() {
               {loading ? "Saving..." : "Save Book"}
             </button>
 
+            {/* Cancel and return to the books page */}
             <button
               type="button"
               className="btn btn-secondary"
