@@ -1,12 +1,10 @@
 import { useEffect, useState } from "react";
 import { getBorrowedBooks } from "../services/lendingService";
+import { useWebSocket } from "../components/WebSocketContext";
 
 function BorrowedBooks() {
   const [books, setBooks] = useState([]);
-
-  useEffect(() => {
-    loadBorrowedBooks();
-  }, []);
+  const { lastMessage } = useWebSocket();
 
   const loadBorrowedBooks = async () => {
     try {
@@ -17,6 +15,17 @@ function BorrowedBooks() {
       alert("Failed to load borrowed books.");
     }
   };
+
+  useEffect(() => {
+    loadBorrowedBooks();
+  }, []);
+
+  // Auto-refresh when a WebSocket message is received (lending/return events)
+  useEffect(() => {
+    if (lastMessage) {
+      loadBorrowedBooks();
+    }
+  }, [lastMessage]);
 
   return (
     <div className="container mt-4">

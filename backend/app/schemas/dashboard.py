@@ -6,6 +6,7 @@ from app.schemas.shelf import ShelfResponse
 from app.schemas.stats import StatsResponse
 from app.schemas.activity import ActivityResponse
 from app.schemas.shelf_share import SharedShelfResponse
+from app.schemas.lending import LendingResponse
 
 
 class UserDashboard(BaseModel):
@@ -23,6 +24,6 @@ class DashboardResponse(BaseModel):
     favorite_books: list[BookResponse]
     recent_books: list[BookResponse]
     shelves: list[ShelfResponse]
-    lent_books: list[Any]
+    lent_books: list[LendingResponse]
     shared_shelves: list[SharedShelfResponse]
     activity_feed: list[ActivityResponse]

@@ -107,10 +107,18 @@ def get_dashboard(
             db=db,
             owner_id=current_user.id,
         ),
-        "shared_shelves": ShelfShareRepository.get_shared_shelves(
-            db=db,
-            user_id=current_user.id,
-        ),
+        "shared_shelves": [
+            {
+                "id": shelf.id,
+                "name": shelf.name,
+                "owner_name": owner.name,
+                "role": share.role,
+            }
+            for shelf, share, owner in ShelfShareRepository.get_shared_shelves(
+                db=db,
+                user_id=current_user.id,
+            )
+        ],
         "activity_feed": get_user_activities(
             db=db,
             user_id=current_user.id,
