@@ -1,9 +1,11 @@
 import { useNavigate } from "react-router-dom";
 import api from "../api/axios";
 
+// Top navigation bar displayed across the application
 function Navbar() {
   const navigate = useNavigate();
 
+  // Handle user logout
   const handleLogout = async () => {
     if (window.confirm("Are you sure you want to logout?")) {
       try {
@@ -13,8 +15,13 @@ function Navbar() {
         // Even if logout API fails, clear local state
       }
 
+      // Remove the stored access token
       sessionStorage.removeItem("access_token");
+
+      // Close the active WebSocket connection
       import("../services/websocketService").then(m => m.default.disconnect());
+
+      // Notify the user and redirect to the login page
       alert("Logout successful");
       navigate("/login");
     }
@@ -26,6 +33,7 @@ function Navbar() {
     >
       <div className="container-fluid">
 
+        {/* Application logo and dashboard navigation */}
         <span
           className="navbar-brand fw-bold fs-3"
           style={{ cursor: "pointer", color: "red" }}
@@ -34,6 +42,7 @@ function Navbar() {
           📚 BookNest
         </span>
 
+        {/* Logout button */}
         <button
           className="btn btn-danger"
           onClick={handleLogout}

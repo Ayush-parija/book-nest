@@ -4,21 +4,28 @@ import { useNavigate } from "react-router-dom";
 import { getBooks } from "../services/bookService";
 import { lendBook } from "../services/lendingService";
 
+// Form component for lending a book to another user
 function LendingForm() {
   const navigate = useNavigate();
 
+  // Store the list of available books
   const [books, setBooks] = useState([]);
+
+  // Track form submission state
   const [loading, setLoading] = useState(false);
 
+  // Store form input values
   const [formData, setFormData] = useState({
     book_id: "",
     borrower_email: "",
   });
 
+  // Load books when the component is mounted
   useEffect(() => {
     fetchBooks();
   }, []);
 
+  // Fetch available books from the backend
   const fetchBooks = async () => {
     try {
       const data = await getBooks();
@@ -36,6 +43,7 @@ function LendingForm() {
     }
   };
 
+  // Update form fields as the user enters data
   const handleChange = (e) => {
     setFormData((prev) => ({
       ...prev,
@@ -43,14 +51,17 @@ function LendingForm() {
     }));
   };
 
+  // Submit the lending request
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    // Ensure a book is selected
     if (!formData.book_id) {
       alert("Please select a book.");
       return;
     }
 
+    // Validate borrower email
     if (!formData.borrower_email.trim()) {
       alert("Please enter borrower email.");
       return;
@@ -59,6 +70,7 @@ function LendingForm() {
     try {
       setLoading(true);
 
+      // Send the lending request to the backend
       const response = await lendBook(
         Number(formData.book_id),
         {
@@ -70,8 +82,10 @@ function LendingForm() {
 
       alert("Book lent successfully!");
 
+      // Redirect to the lent books page
       navigate("/lending/lent");
     } catch (error) {
+      // Log detailed error information for debugging
       console.error("========== LENDING ERROR ==========");
       console.error("Full Error:", error);
       console.error("Response:", error.response);
@@ -85,6 +99,7 @@ function LendingForm() {
         "Failed to lend book."
       );
     } finally {
+      // Reset loading state
       setLoading(false);
     }
   };
@@ -99,12 +114,15 @@ function LendingForm() {
           borderRadius: "15px",
         }}
       >
+        {/* Form header */}
         <div className="card-header bg-primary text-white">
           <h3 className="mb-0">📚 Lend a Book</h3>
         </div>
 
         <div className="card-body">
           <form onSubmit={handleSubmit}>
+
+            {/* Book selection dropdown */}
             <div className="mb-3">
               <label className="form-label">
                 Select Book
@@ -131,6 +149,7 @@ function LendingForm() {
               </select>
             </div>
 
+            {/* Borrower email input */}
             <div className="mb-3">
               <label className="form-label">
                 Borrower Email
@@ -146,6 +165,7 @@ function LendingForm() {
               />
             </div>
 
+            {/* Submit button */}
             <button
               type="submit"
               className="btn btn-success me-2"
@@ -154,6 +174,7 @@ function LendingForm() {
               {loading ? "Lending..." : "Lend Book"}
             </button>
 
+            {/* Cancel and return to lending page */}
             <button
               type="button"
               className="btn btn-secondary"
@@ -161,6 +182,7 @@ function LendingForm() {
             >
               Cancel
             </button>
+
           </form>
         </div>
       </div>

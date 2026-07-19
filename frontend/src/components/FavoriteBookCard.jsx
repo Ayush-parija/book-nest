@@ -1,9 +1,14 @@
 import { toggleFavorite } from "../services/bookService";
 
+// Displays detailed information for a favorite book
 function FavoriteBookCard({ book, refreshFavorites }) {
+
+  // Remove the book from the favorites list
   const handleRemoveFavorite = async () => {
     try {
       await toggleFavorite(book.id);
+
+      // Refresh the favorite books after updating
       refreshFavorites();
     } catch (error) {
       console.error(error);
@@ -11,6 +16,7 @@ function FavoriteBookCard({ book, refreshFavorites }) {
     }
   };
 
+  // Format dates into a readable format
   const formatDate = (date) => {
     if (!date) return "N/A";
     return new Date(date).toLocaleDateString();
@@ -27,6 +33,7 @@ function FavoriteBookCard({ book, refreshFavorites }) {
     >
       <div className="card-body">
 
+        {/* Book title and favorite badge */}
         <div className="d-flex justify-content-between align-items-center mb-3">
 
           <h3 className="mb-0 text-primary">
@@ -43,6 +50,7 @@ function FavoriteBookCard({ book, refreshFavorites }) {
 
         <div className="row">
 
+          {/* Left section with basic book details */}
           <div className="col-md-6">
             <p>
               <strong>Author:</strong> {book.author}
@@ -66,6 +74,7 @@ function FavoriteBookCard({ book, refreshFavorites }) {
             </p>
           </div>
 
+          {/* Right section with rating and dates */}
           <div className="col-md-6">
             <p>
               <strong>Rating:</strong>{" "}
@@ -87,6 +96,7 @@ function FavoriteBookCard({ book, refreshFavorites }) {
 
         </div>
 
+        {/* Display notes when available */}
         {book.notes && (
           <>
             <hr className="border-secondary" />
@@ -106,6 +116,7 @@ function FavoriteBookCard({ book, refreshFavorites }) {
           </>
         )}
 
+        {/* Remove favorite button */}
         <div className="mt-4">
 
           <button

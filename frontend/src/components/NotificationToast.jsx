@@ -2,10 +2,15 @@ import React, { useEffect, useState } from 'react';
 import { useWebSocket } from './WebSocketContext';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
+// Displays real-time notifications received through the WebSocket connection
 const NotificationToast = () => {
+  // Get the latest WebSocket message
   const { lastMessage } = useWebSocket();
+
+  // Store active notification toasts
   const [toasts, setToasts] = useState([]);
 
+  // Create a new toast whenever a new message is received
   useEffect(() => {
     if (lastMessage) {
       const newToast = {
@@ -13,6 +18,7 @@ const NotificationToast = () => {
         message: lastMessage,
       };
       
+      // Add the new toast to the list
       setToasts((prev) => [...prev, newToast]);
 
       // Auto-remove toast after 5 seconds
@@ -22,6 +28,7 @@ const NotificationToast = () => {
     }
   }, [lastMessage]);
 
+  // Do not render anything when there are no notifications
   if (toasts.length === 0) return null;
 
   return (
@@ -35,6 +42,7 @@ const NotificationToast = () => {
         zIndex: 1050,
       }}
     >
+      {/* Render all active notification toasts */}
       {toasts.map((toast) => (
         <div
           key={toast.id}
@@ -45,9 +53,12 @@ const NotificationToast = () => {
           style={{ minWidth: '250px' }}
         >
           <div className="d-flex">
+            {/* Toast message */}
             <div className="toast-body">
               {toast.message}
             </div>
+
+            {/* Close the notification manually */}
             <button
               type="button"
               className="btn-close btn-close-white me-2 m-auto"

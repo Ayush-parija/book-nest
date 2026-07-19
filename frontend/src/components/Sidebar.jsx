@@ -1,6 +1,8 @@
 import { NavLink } from "react-router-dom";
 
+// Sidebar navigation for accessing different sections of the application
 function Sidebar() {
+  // Apply styles based on the active navigation link
   const linkStyle = ({ isActive }) => ({
     display: "block",
     padding: "12px 16px",
@@ -22,6 +24,7 @@ function Sidebar() {
         boxSizing: "border-box",
       }}
     >
+      {/* Application title */}
       <h2 style={{ marginBottom: "25px", color: "red" }}>📚 BookNest</h2>
 
       {/* Dashboard */}
@@ -49,28 +52,27 @@ function Sidebar() {
         🗂 Shelves
       </NavLink>
 
-      {/* ========================= */}
-      {/* Lending */}
-      {/* ========================= */}
-
+      {/* Lending History */}
       <NavLink to="/lending" style={linkStyle}>
         📦 Lending History
       </NavLink>
 
+      {/* Lend a new book */}
       <NavLink to="/lending/new" style={linkStyle}>
         ➕ Lend Book
       </NavLink>
 
+      {/* Borrowed books */}
       <NavLink to="/lending/borrowed" style={linkStyle}>
         📖 Borrowed Books
       </NavLink>
 
+      {/* Lent books */}
       <NavLink to="/lending/lent" style={linkStyle}>
         📚 Lent Books
       </NavLink>
 
-
-      {/* Activity */}
+      {/* Activity log */}
       <NavLink to="/activity" style={linkStyle}>
         📝 Activity
       </NavLink>

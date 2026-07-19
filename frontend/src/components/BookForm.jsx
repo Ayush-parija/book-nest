@@ -1,13 +1,26 @@
 import { useEffect, useState } from "react";
 
+// Reusable form component for creating and editing books
 function BookForm({ initialData = {}, onSubmit, buttonText }) {
+  // Store the book title
   const [title, setTitle] = useState("");
+
+  // Store the author name
   const [author, setAuthor] = useState("");
+
+  // Store the reading status
   const [status, setStatus] = useState("Want to Read");
+
+  // Store the total number of pages
   const [totalPages, setTotalPages] = useState("");
+
+  // Store the user rating
   const [rating, setRating] = useState("");
+
+  // Store additional notes
   const [notes, setNotes] = useState("");
 
+  // Populate the form when editing an existing book
   useEffect(() => {
     if (initialData) {
       setTitle(initialData.title || "");
@@ -19,6 +32,7 @@ function BookForm({ initialData = {}, onSubmit, buttonText }) {
     }
   }, [initialData]);
 
+  // Submit the form data to the parent component
   const handleSubmit = (e) => {
     e.preventDefault();
 
@@ -34,8 +48,11 @@ function BookForm({ initialData = {}, onSubmit, buttonText }) {
 
   return (
     <form onSubmit={handleSubmit} className="card shadow p-4">
+
+      {/* Form heading */}
       <h2 className="mb-4 text-center">{buttonText}</h2>
 
+      {/* Book title input */}
       <div className="mb-3">
         <label className="form-label">Book Title</label>
         <input
@@ -48,6 +65,7 @@ function BookForm({ initialData = {}, onSubmit, buttonText }) {
         />
       </div>
 
+      {/* Author input */}
       <div className="mb-3">
         <label className="form-label">Author</label>
         <input
@@ -60,6 +78,7 @@ function BookForm({ initialData = {}, onSubmit, buttonText }) {
         />
       </div>
 
+      {/* Reading status selector */}
       <div className="mb-3">
         <label className="form-label">Status</label>
         <select
@@ -73,6 +92,7 @@ function BookForm({ initialData = {}, onSubmit, buttonText }) {
         </select>
       </div>
 
+      {/* Total pages input */}
       <div className="mb-3">
         <label className="form-label">Total Pages</label>
         <input
@@ -84,6 +104,7 @@ function BookForm({ initialData = {}, onSubmit, buttonText }) {
         />
       </div>
 
+      {/* Rating input */}
       <div className="mb-3">
         <label className="form-label">Rating (1-5)</label>
         <input
@@ -97,6 +118,7 @@ function BookForm({ initialData = {}, onSubmit, buttonText }) {
         />
       </div>
 
+      {/* Notes input */}
       <div className="mb-3">
         <label className="form-label">Notes</label>
         <textarea
@@ -108,9 +130,11 @@ function BookForm({ initialData = {}, onSubmit, buttonText }) {
         />
       </div>
 
+      {/* Submit button */}
       <button type="submit" className="btn btn-success">
         {buttonText}
       </button>
+
     </form>
   );
 }
